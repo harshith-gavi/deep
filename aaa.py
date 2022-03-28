@@ -7,8 +7,8 @@ Original file is located at
     https://colab.research.google.com/drive/1ImpVvINT-3YbrIVvTxs1YYZR4eViu84_
 """
 
-!pip install transformers
-!pip install datasets
+pip install transformers
+pip install datasets
 
 import torch
 from torch import nn
