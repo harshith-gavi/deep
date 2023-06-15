@@ -219,14 +219,17 @@ model_u = []
 model_spk = []
 
 for _ in range(10):
-    print('Epoch ', _)
+    print('Epoch', _)
+    batch_n = 1
     for batch in shd_train:
+        print('Batch', batch_n)
         inputs, labels = batch
         xx = inputs.to_dense()
         out, t_m, t_adp = model.forward(xx)
         model.update_params(out, t_m, t_adp)
         model_u.append(model.u_t)
         model_spk.append(model.spk) 
+        batch_n += 1
 
 print('Training Complete')
 
