@@ -217,10 +217,10 @@ model = LSNN(700, [256, 64], 20, 16).to(device)
 
 model_u = []
 model_spk = []
-shd_train = shd_train[:80]
+shd_train = shd_train[:50]
 
 print('TRAINING THE MODEL...', end = '\t')
-for _ in range(2):
+for _ in range(1, 3):
     progress_bar = tqdm(total=len(shd_train), desc='Epoch {}'.format(_), unit='iteration')
     for batch in shd_train:
         inputs, labels = batch
