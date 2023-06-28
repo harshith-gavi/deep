@@ -124,17 +124,17 @@ class LSNN(nn.Module):
         self.thr = 0.5                                          # Threshold
         self.thr_min = 0.01                                     # Threshold Baseline
 
-        self.u1 = torch.zeros(b_size, h_size[0])                # Membrane Potentials
-        self.u2 = torch.zeros(b_size, h_size[1])
-        self.u3 = torch.zeros(b_size, o_size)
+        self.u1 = torch.zeros(b_size, h_size[0]).to(device)                # Membrane Potentials
+        self.u2 = torch.zeros(b_size, h_size[1]).to(device)
+        self.u3 = torch.zeros(b_size, o_size).to(device)
 
-        self.b1 = torch.zeros(b_size, h_size[0])
-        self.b2 = torch.zeros(b_size, h_size[1])
-        self.b3 = torch.zeros(b_size, o_size)
+        self.b1 = torch.zeros(b_size, h_size[0]).to(device)
+        self.b2 = torch.zeros(b_size, h_size[1]).to(device)
+        self.b3 = torch.zeros(b_size, o_size).to(device)
 
-        self.spk1 = torch.zeros(b_size, h_size[0])              # Spikes
-        self.spk2 = torch.zeros(b_size, h_size[1])
-        self.spk_out = torch.zeros(b_size, o_size)
+        self.spk1 = torch.zeros(b_size, h_size[0]).to(device)              # Spikes
+        self.spk2 = torch.zeros(b_size, h_size[1]).to(device)
+        self.spk_out = torch.zeros(b_size, o_size).to(device)
 
         self.syn1 = nn.Linear(i_size, h_size[0])                # Synapses/Connections
         self.syn2 = nn.Linear(h_size[0], h_size[1])
@@ -198,7 +198,7 @@ class LSNN(nn.Module):
         INPUT: Spikes
         OUTPUT: Spikes
         """
-        L1 = self.syn1(x_t).to(device)
+        L1 = self.syn1(x_t)
         T_m = self.act(self.l1_T_m(L1 + self.u1))
         T_adp = self.act(self.l1_T_adp(L1 + self.b1))
         self.u1, self.spk1, self.b1 = self.update_params(L1, self.u1, self.spk1, T_m, T_adp, self.b1)
