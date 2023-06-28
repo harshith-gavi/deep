@@ -1,6 +1,7 @@
 # !pip install tonic
 # !pip install snntorch
 # !pip install torchplot
+print('IMPORTING LIBRARIES...', end = '\t')
 import h5py
 import numpy as np
 import matplotlib.pyplot as plt
@@ -21,6 +22,7 @@ import snntorch as snn
 from snntorch import spikeplot as splt
 from snntorch import spikegen
 
+print('DONE')
 
 datapath = './data/'
 device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
@@ -62,14 +64,15 @@ def data_mod(X, y, batch_size, step_size, input_size, max_time, shuffle=True):
         v = torch.FloatTensor(np.ones(len(coo[0]))).to(device)
 
         X_batch = torch.sparse.FloatTensor(i, v, torch.Size([batch_size,step_size,input_size])).to(device)
-        y_batch = torch.tensor(labels[batch_index],device=device)
+        y_batch = torch.tensor(labels[batch_index], device)
 
-        mod_data.append((X_batch.to(device=device), y_batch.to(device=device)))
+        mod_data.append((X_batch.to(device), y_batch.to(device)))
 
         counter += 1
 
     return mod_data
 
+print('PREPROCESSING DATA...', end = '\t')
 shd_train = tonic.datasets.SHD(save_to = datapath + 'train_data')
 shd_test = tonic.datasets.SHD(save_to = datapath + 'test_data', train = False)
 
@@ -78,6 +81,7 @@ shd_test = h5py.File(datapath + 'test_data/SHD/shd_test.h5', 'r')
 
 shd_train = data_mod(shd_train['spikes'], shd_train['labels'], batch_size = 16, step_size = 100, input_size = tonic.datasets.SHD.sensor_size[0], max_time = 1.4)
 shd_test = data_mod(shd_test['spikes'], shd_test['labels'], batch_size = 1, step_size = 100, input_size = tonic.datasets.SHD.sensor_size[0], max_time = 1.4)
+print('DONE')
 
 #Straight from the github
 
@@ -214,6 +218,7 @@ model = LSNN(700, [256, 64], 20, 16).to(device)
 model_u = []
 model_spk = []
 
+print('TRAINING THE MODEL...', end = '\t')
 for _ in range(2):
     progress_bar = tqdm(total=len(shd_train), desc='Epoch {}'.format(_), unit='iteration')
     for batch in shd_train:
@@ -226,4 +231,4 @@ for _ in range(2):
             model_spk.append(model.spk_out)
             progress_bar.update(1)
         progress_bar.close()
-
+print('DONE')
