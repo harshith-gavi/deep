@@ -217,7 +217,7 @@ model = LSNN(700, [256, 64], 20, 16).to(device)
 
 model_u = []
 model_spk = []
-shd_train = shd_train[:100]
+shd_train = shd_train[:80]
 
 print('TRAINING THE MODEL...', end = '\t')
 for _ in range(2):
