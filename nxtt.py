@@ -73,8 +73,8 @@ def data_mod(X, y, batch_size, step_size, input_size, max_time, shuffle=True):
     return mod_data
 
 print('PREPROCESSING DATA...', end = '\t')
-shd_train = tonic.datasets.SHD(save_to = datapath + 'train_data')
-shd_test = tonic.datasets.SHD(save_to = datapath + 'test_data', train = False)
+# shd_train = tonic.datasets.SHD(save_to = datapath + 'train_data')
+# shd_test = tonic.datasets.SHD(save_to = datapath + 'test_data', train = False)
 
 shd_train = h5py.File(datapath + 'train_data/SHD/shd_train.h5', 'r')
 shd_test = h5py.File(datapath + 'test_data/SHD/shd_test.h5', 'r')
