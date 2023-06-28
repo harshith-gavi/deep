@@ -64,7 +64,7 @@ def data_mod(X, y, batch_size, step_size, input_size, max_time, shuffle=True):
         v = torch.FloatTensor(np.ones(len(coo[0]))).to(device)
 
         X_batch = torch.sparse.FloatTensor(i, v, torch.Size([batch_size,step_size,input_size])).to(device)
-        y_batch = torch.tensor(labels[batch_index], device)
+        y_batch = torch.tensor(labels[batch_index], device = device)
 
         mod_data.append((X_batch.to(device), y_batch.to(device)))
 
