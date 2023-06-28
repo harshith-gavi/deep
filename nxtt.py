@@ -24,7 +24,7 @@ from snntorch import spikegen
 
 print('DONE')
 
-datapath = '/data/'
+datapath = '../data/'
 device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
 
 def data_mod(X, y, batch_size, step_size, input_size, max_time, shuffle=True):
