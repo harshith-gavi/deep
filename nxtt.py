@@ -22,8 +22,8 @@ from snntorch import spikeplot as splt
 from snntorch import spikegen
 
 
-datapath = './thesis/'
-device = torch.device('' if torch.cuda.is_available() else 'cpu')
+datapath = './data/'
+device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
 
 def data_mod(X, y, batch_size, step_size, input_size, max_time, shuffle=True):
     '''
