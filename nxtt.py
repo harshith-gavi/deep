@@ -24,7 +24,7 @@ from snntorch import spikegen
 
 print('DONE')
 
-datapath = './data/'
+datapath = '../data/'
 device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
 
 def data_mod(X, y, batch_size, step_size, input_size, max_time, shuffle=True):
@@ -217,6 +217,7 @@ model = LSNN(700, [256, 64], 20, 16).to(device)
 
 model_u = []
 model_spk = []
+shd_train = shd_train[:100]
 
 print('TRAINING THE MODEL...', end = '\t')
 for _ in range(2):
