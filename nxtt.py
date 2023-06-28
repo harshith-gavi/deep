@@ -227,6 +227,7 @@ for _ in range(2):
         # xx = inputs.to_dense()
         for i in range(seq_num):
             xx = inputs.to_dense()[:, i, :]
+            xx.to(device)
             model.FPTT(xx)
             model_spk.append(model.spk_out)
             progress_bar.update(1)
