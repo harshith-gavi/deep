@@ -121,13 +121,13 @@ class LSNN(nn.Module):
         self.thr = 0.5                                          # Threshold
         self.thr_min = 0.01                                     # Threshold Baseline
 
-        self.u1 = torch.zeros(b_size, h_size[0])                # Membrane Potentials
-        self.u2 = torch.zeros(b_size, h_size[1])
-        self.u3 = torch.zeros(b_size, o_size)
+        self.u1 = torch.zeros(b_size, h_size[0]).to(device)                # Membrane Potentials
+        self.u2 = torch.zeros(b_size, h_size[1]).to(device)
+        self.u3 = torch.zeros(b_size, o_size).to(device)
 
-        self.b1 = torch.zeros(b_size, h_size[0]).to(device)
-        self.b2 = torch.zeros(b_size, h_size[1]).to(device)
-        self.b3 = torch.zeros(b_size, o_size).to(device)
+        self.b1 = torch.zeros(b_size, h_size[0])
+        self.b2 = torch.zeros(b_size, h_size[1])
+        self.b3 = torch.zeros(b_size, o_size)
 
         self.spk1 = torch.zeros(b_size, h_size[0]).to(device)              # Spikes
         self.spk2 = torch.zeros(b_size, h_size[1]).to(device)
