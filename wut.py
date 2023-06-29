@@ -254,8 +254,10 @@ for _ in range(start_epoch, 10):
             model.FPTT(xx)
             model_spk.append(model.spk_out)
 
-        save_checkpoint(model, _, batch_idx)
+            save_checkpoint(model, _, batch_idx)
         
         progress_bar.update(1)
     progress_bar.close()
+    start_batch = 0
+    
 print('DONE')
