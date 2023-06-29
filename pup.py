@@ -235,7 +235,6 @@ def ALLEZ():
     start_epoch = 1
     start_batch = 0
     resume_training = False
-    shd_train = shd_train[:1]
     
     checkpoint_files = [file for file in os.listdir() if file.startswith('checkpoint')]
     if checkpoint_files:
