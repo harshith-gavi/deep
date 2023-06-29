@@ -13,14 +13,14 @@ import tonic.transforms as ttr
 
 import torch
 import torch.nn as nn
-import torchplot as tp
+# import torchplot as tp
 from torch.utils.data import DataLoader
 from torchvision import datasets, transforms
 import torch.utils.checkpoint as checkpoint
 
-import snntorch as snn
-from snntorch import spikeplot as splt
-from snntorch import spikegen
+# import snntorch as snn
+# from snntorch import spikeplot as splt
+# from snntorch import spikegen
 
 datapath = '../data/'
 device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
@@ -224,18 +224,12 @@ for _ in range(1, 5):
         inputs, labels = batch
         b_size, seq_num, i_size = inputs.shape
 
-        def train_model():
-            for i in range(seq_num):
-                xx = inputs.to_dense()[:, i, :]
-                model.FPTT(xx)
-                model_spk.append(model.spk_out)
-                del xx
-
-        for i in range(0, seq_num, 10):  # Splitting the sequence into smaller chunks
-            chunk_inputs = inputs[:, i:i+10, :]  # Chunk of 10 timesteps
-            chunk_outputs = checkpoint.checkpoint(train_model, chunk_inputs)
-            model_spk.extend(chunk_outputs)
+        for i in range(seq_num):
+            xx = inputs.to_dense()[:, i, :]
+            model.FPTT(xx)
+            model_spk.append(model.spk_out)
+            del xx
         
         progress_bar.update(1)
-        torch.cuda.empty_cache()
+
     progress_bar.close()
