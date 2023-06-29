@@ -10,7 +10,6 @@ from tqdm import tqdm
 
 import tonic
 import tonic.transforms as ttr
-from tonic import DiskCachedDataset
 
 import torch
 import torch.nn as nn
@@ -213,7 +212,8 @@ class LSNN(nn.Module):
         T_adp = self.act(self.o_T_adp(L3 + self.b3))
         self.u3, self.spk_out, self.b3 =  self.update_params(L3, self.u3, self.spk_out, T_m, T_adp, self.b3)
 
-model = LSNN(700, [256, 64], 20, 1).to(device)
+model = LSNN(700, [256, 64], 20, 1)
+model.to(device)
 
 model_u = []
 model_spk = []
@@ -226,7 +226,7 @@ for _ in range(1, 2):
     for batch in shd_train:
         inputs, labels = batch
         b_size, seq_num, i_size = inputs.shape
-        # xx = inputs.to_dense()
+        
         for i in range(seq_num):
             xx = inputs.to_dense()[:, i, :]
             model.FPTT(xx)
