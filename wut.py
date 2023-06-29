@@ -11,7 +11,6 @@ from tqdm import tqdm
 
 import tonic
 import tonic.transforms as ttr
-from tonic import DiskCachedDataset
 
 import torch
 import torch.nn as nn
@@ -218,7 +217,6 @@ def save_checkpoint(model, epoch, batch):
     checkpoint = {'model_state_dict': model.state_dict(), 'epoch': epoch, 'batch': batch}
     checkpoint_path = f'checkpoint_epoch_{epoch}_batch_{batch}.pt'
     torch.save(checkpoint, checkpoint_path)
-    print(f'Checkpoint saved: {checkpoint_path}')
 
 def load_checkpoint(model, checkpoint_path):
     checkpoint = torch.load(checkpoint_path)
@@ -254,7 +252,7 @@ for _ in range(start_epoch, 10):
             model.FPTT(xx)
             model_spk.append(model.spk_out)
 
-            save_checkpoint(model, _, batch_idx)
+        save_checkpoint(model, _, batch_idx)
         
         progress_bar.update(1)
     progress_bar.close()
