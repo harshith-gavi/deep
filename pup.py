@@ -227,6 +227,10 @@ def load_checkpoint(model, checkpoint_path):
     return epoch, batch
 
 def choo_choo_train():
+    start_epoch = 1
+    start_batch = 0
+    resume_training = False
+    
     checkpoint_files = [file for file in os.listdir() if file.startswith('checkpoint')]
     if checkpoint_files:
         resume_training = True
@@ -268,8 +272,5 @@ model = LSNN(700, [256, 64], 20, 128).to(device)
 model_u = []
 model_spk = []
 shd_train = shd_train[:10]
-start_epoch = 1
-start_batch = 0
-resume_training = False
 
 choo_choo_train()
