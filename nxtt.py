@@ -222,7 +222,8 @@ shd_train = shd_train[:train_size]
 
 print('TRAINING THE MODEL...')
 for _ in range(1, 2):
-    progress_bar = tqdm(total=len(shd_train), desc='Epoch {}'.format(_), unit='iteration')
+    # progress_bar = tqdm(total=len(shd_train), desc='Epoch {}'.format(_), unit='iteration')
+    progress_bar = tqdm(total = len(shd_train), desc='Epoch {}'.format(_))
     for batch in shd_train:
         inputs, labels = batch
         b_size, seq_num, i_size = inputs.shape
@@ -231,6 +232,6 @@ for _ in range(1, 2):
             xx = inputs.to_dense()[:, i, :]
             model.FPTT(xx)
             model_spk.append(model.spk_out)
-            progress_bar.update(1)
-        progress_bar.close()
+        progress_bar.update(1)
+    progress_bar.close()
 print('DONE')
