@@ -23,8 +23,9 @@ import torch.utils.checkpoint as checkpoint
 # from snntorch import spikegen
 
 datapath = '../data/'
-device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
-print('Using {}'.format(device))
+torch.cuda.set_device(0)
+device_1 = torch.device('cuda:0')  # First CUDA device
+device_2 = torch.device('cuda:1')  # Second CUDA device
 
 def data_mod(X, y, batch_size, step_size, input_size, max_time, shuffle=True):
     labels = np.array(y, int)
@@ -73,6 +74,12 @@ shd_test = h5py.File(datapath + 'test_data/SHD/shd_test.h5', 'r')
 
 shd_train = list(data_mod(shd_train['spikes'], shd_train['labels'], batch_size=256, step_size=100, input_size=tonic.datasets.SHD.sensor_size[0], max_time=1.4))
 shd_test = list(data_mod(shd_test['spikes'], shd_test['labels'], batch_size=1, step_size=100, input_size=tonic.datasets.SHD.sensor_size[0], max_time=1.4))
+
+for i, (inputs, _) in enumerate(shd_train):
+    shd_train[i] = (inputs.to(device_1), _)
+
+for i, (inputs, _) in enumerate(shd_test):
+    shd_test[i] = (inputs.to(device_1), _)
 
 #Straight from the github
 
@@ -200,12 +207,16 @@ class LSNN(nn.Module):
         self.u2, self.spk2, self.b2  = self.update_params(L2, self.u2, self.spk2, T_m, T_adp, self.b2)
 
         L3 = self.syn3(self.spk2)
+        L3 = L3.to(device_2)
         T_m = self.act(self.o_T_m(L3 + self.u3))
         T_adp = self.act(self.o_T_adp(L3 + self.b3))
         self.u3, self.spk_out, self.b3 =  self.update_params(L3, self.u3, self.spk_out, T_m, T_adp, self.b3)
 
+        self.spk_out = self.spk_out.to(device_1)
+
 model = LSNN(700, [256, 64], 20, 256)
-model.to(device)
+model.to(device_1)
+model = nn.DataParallel(model, device_ids=[0, 1])
 
 model_u = []
 model_spk = []
@@ -220,7 +231,7 @@ for _ in range(1, 5):
         for i in range(seq_num):
             xx = inputs.to_dense()[:, i, :]
             model.FPTT(xx)
-            model_spk.append(model.spk_out)
+            model_spk.append(model.spk_out.cpu())
             del xx
         
         progress_bar.update(1)
