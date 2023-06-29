@@ -117,28 +117,28 @@ class LSNN(nn.Module):
     def __init__(self, i_size, h_size, o_size, b_size):
         super(LSNN, self).__init__()
 
-        self.u_r = 0                                            # Resting Potential
-        self.thr = 0.5                                          # Threshold
-        self.thr_min = 0.01                                     # Threshold Baseline
+        self.u_r = 0                                                # Resting Potential
+        self.thr = 0.5                                              # Threshold
+        self.thr_min = 0.01                                         # Threshold Baseline
 
-        self.u1 = torch.zeros(b_size, h_size[0]).to(device)                # Membrane Potentials
+        self.u1 = torch.zeros(b_size, h_size[0]).to(device)         # Membrane Potentials
         self.u2 = torch.zeros(b_size, h_size[1]).to(device)
         self.u3 = torch.zeros(b_size, o_size).to(device)
 
-        self.b1 = torch.zeros(b_size, h_size[0])
-        self.b2 = torch.zeros(b_size, h_size[1])
-        self.b3 = torch.zeros(b_size, o_size)
+        self.b1 = torch.zeros(b_size, h_size[0]).to(device)
+        self.b2 = torch.zeros(b_size, h_size[1]).to(device)
+        self.b3 = torch.zeros(b_size, o_size).to(device)
 
-        self.spk1 = torch.zeros(b_size, h_size[0]).to(device)              # Spikes
-        self.spk2 = torch.zeros(b_size, h_size[1]).to(device)
-        self.spk_out = torch.zeros(b_size, o_size).to(device)
+        self.spk1 = torch.zeros(b_size, h_size[0])       # Spikes
+        self.spk2 = torch.zeros(b_size, h_size[1])
+        self.spk_out = torch.zeros(b_size, o_size)
 
-        self.syn1 = nn.Linear(i_size, h_size[0])                # Synapses/Connections
+        self.syn1 = nn.Linear(i_size, h_size[0])                    # Synapses/Connections
         self.syn2 = nn.Linear(h_size[0], h_size[1])
         self.syn3 = nn.Linear(h_size[1], o_size)
 
-        self.l1_T_adp = nn.Linear(h_size[0], h_size[0])         # Adaptation Time Constant
-        self.l1_T_m = nn.Linear(h_size[0], h_size[0])           # Membrane Time Constant
+        self.l1_T_adp = nn.Linear(h_size[0], h_size[0])             # Adaptation Time Constant
+        self.l1_T_m = nn.Linear(h_size[0], h_size[0])               # Membrane Time Constant
 
         self.l2_T_adp = nn.Linear(h_size[1], h_size[1])
         self.l2_T_m = nn.Linear(h_size[1], h_size[1])
@@ -148,7 +148,7 @@ class LSNN(nn.Module):
 
         self.act = nn.Sigmoid()
 
-        nn.init.ones_(self.syn1.weight)                         # Parameter Initialisation
+        nn.init.ones_(self.syn1.weight)                             # Parameter Initialisation
         nn.init.zeros_(self.syn1.bias)
         nn.init.ones_(self.l1_T_adp.weight)
         nn.init.ones_(self.l1_T_m.weight)
