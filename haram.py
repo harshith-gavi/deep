@@ -17,7 +17,6 @@ import torch.nn as nn
 from torch.utils.data import DataLoader
 # from torchvision import datasets, transforms
 import torch.utils.checkpoint as checkpoint
-import torch.cuda.device as device
 
 # import snntorch as snn
 # from snntorch import spikeplot as splt
@@ -55,8 +54,8 @@ def data_mod(X, y, batch_size, step_size, input_size, max_time, shuffle=True):
             coo[1].extend(times)
             coo[2].extend(units)
 
-        i = torch.LongTensor(coo).to(device)
-        v = torch.FloatTensor(np.ones(len(coo[0]))).to(device)
+        i = torch.LongTensor(coo).to(device_1)
+        v = torch.FloatTensor(np.ones(len(coo[0]))).to(device_1)
 
         X_batch = torch.sparse.FloatTensor(i, v, torch.Size([batch_size, step_size, input_size])).to(device)
         y_batch = torch.tensor(labels[batch_index], device=device)
