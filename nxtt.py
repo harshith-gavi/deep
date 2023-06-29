@@ -233,7 +233,7 @@ for _ in range(1, 5):
 
         for i in range(0, seq_num, 10):  # Splitting the sequence into smaller chunks
             chunk_inputs = inputs[:, i:i+10, :]  # Chunk of 10 timesteps
-            chunk_outputs = checkpoint.checkpoint(run_model, chunk_inputs)
+            chunk_outputs = checkpoint.checkpoint(train_model, chunk_inputs)
             model_spk.extend(chunk_outputs)
         
         progress_bar.update(1)
