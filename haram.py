@@ -17,6 +17,7 @@ import torch.nn as nn
 from torch.utils.data import DataLoader
 # from torchvision import datasets, transforms
 import torch.utils.checkpoint as checkpoint
+import torch.cuda.device as device
 
 # import snntorch as snn
 # from snntorch import spikeplot as splt
