@@ -253,6 +253,7 @@ for _ in range(start_epoch, 10):
             model.FPTT(xx)
             model_spk.append(model.spk_out)
 
+            del xx
             save_checkpoint(model, _, batch_idx)
         
         progress_bar.update(1)
