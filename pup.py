@@ -276,7 +276,7 @@ while retry_count < 100:
         break
 
     retry_count += 1
-    if retry_count < max_retries:
+    if retry_count < 100:
         time.sleep(retry_delay)
         # Load the latest checkpoint to resume training
         latest_checkpoint = max([file for file in os.listdir() if file.startswith('checkpoint')])
