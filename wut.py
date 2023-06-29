@@ -255,6 +255,7 @@ for _ in range(start_epoch, 10):
 
             del xx
             save_checkpoint(model, _, batch_idx)
+            torch.cuda.empty_cache()
         
         progress_bar.update(1)
     progress_bar.close()
