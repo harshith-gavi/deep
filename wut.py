@@ -2,6 +2,7 @@
 # !pip install snntorch
 # !pip install torchplot
 print('IMPORTING LIBRARIES...', end = '\t')
+import os
 import h5py
 import numpy as np
 import matplotlib.pyplot as plt
