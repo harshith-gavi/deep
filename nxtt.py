@@ -79,7 +79,7 @@ print('PREPROCESSING DATA...', end = '\t')
 shd_train = h5py.File(datapath + 'train_data/SHD/shd_train.h5', 'r')
 shd_test = h5py.File(datapath + 'test_data/SHD/shd_test.h5', 'r')
 
-shd_train = data_mod(shd_train['spikes'], shd_train['labels'], batch_size = 16, step_size = 100, input_size = tonic.datasets.SHD.sensor_size[0], max_time = 1.4)
+shd_train = data_mod(shd_train['spikes'], shd_train['labels'], batch_size = 32, step_size = 100, input_size = tonic.datasets.SHD.sensor_size[0], max_time = 1.4)
 shd_test = data_mod(shd_test['spikes'], shd_test['labels'], batch_size = 1, step_size = 100, input_size = tonic.datasets.SHD.sensor_size[0], max_time = 1.4)
 print('DONE')
 
