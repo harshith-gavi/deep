@@ -270,7 +270,7 @@ def ALLEZ():
     return True, None, None
 
 retry_count = 0
-while retry_count < 100:
+while retry_count < 1000:
     success, last_epoch, last_batch = ALLEZ()
 
     if success:
@@ -278,7 +278,7 @@ while retry_count < 100:
         break
 
     retry_count += 1
-    if retry_count < 100:
+    if retry_count < 1000:
         # Load the latest checkpoint to resume training
         latest_checkpoint = max([file for file in os.listdir() if file.startswith('checkpoint')])
         load_checkpoint(model, latest_checkpoint)
