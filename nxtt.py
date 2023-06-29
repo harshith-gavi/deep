@@ -129,9 +129,9 @@ class LSNN(nn.Module):
         self.b2 = torch.zeros(b_size, h_size[1]).to(device)
         self.b3 = torch.zeros(b_size, o_size).to(device)
 
-        self.spk1 = torch.zeros(b_size, h_size[0])       # Spikes
-        self.spk2 = torch.zeros(b_size, h_size[1])
-        self.spk_out = torch.zeros(b_size, o_size)
+        self.spk1 = torch.zeros(b_size, h_size[0]).to(device)       # Spikes
+        self.spk2 = torch.zeros(b_size, h_size[1]).to(device)
+        self.spk_out = torch.zeros(b_size, o_size).to(device)
 
         self.syn1 = nn.Linear(i_size, h_size[0])                    # Synapses/Connections
         self.syn2 = nn.Linear(h_size[0], h_size[1])
@@ -217,7 +217,7 @@ model_u = []
 model_spk = []
 
 print('TRAINING THE MODEL...')
-for _ in range(1, 2):
+for _ in range(1, 5):
     progress_bar = tqdm(total = len(shd_train), desc = 'Epoch {}'.format(_))
     for batch in shd_train:
         inputs, labels = batch
@@ -227,6 +227,7 @@ for _ in range(1, 2):
             xx = inputs.to_dense()[:, i, :]
             model.FPTT(xx)
             model_spk.append(model.spk_out)
+            del xx
         progress_bar.update(1)
+        torch.cuda.empty_cache()
     progress_bar.close()
-print('DONE')
