@@ -15,7 +15,7 @@ import torch
 import torch.nn as nn
 # import torchplot as tp
 from torch.utils.data import DataLoader
-from torchvision import datasets, transforms
+# from torchvision import datasets, transforms
 import torch.utils.checkpoint as checkpoint
 
 # import snntorch as snn
