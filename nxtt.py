@@ -79,7 +79,7 @@ print('PREPROCESSING DATA...', end = '\t')
 shd_train = h5py.File(datapath + 'train_data/SHD/shd_train.h5', 'r')
 shd_test = h5py.File(datapath + 'test_data/SHD/shd_test.h5', 'r')
 
-shd_train = data_mod(shd_train['spikes'], shd_train['labels'], batch_size = 32, step_size = 100, input_size = tonic.datasets.SHD.sensor_size[0], max_time = 1.4)
+shd_train = data_mod(shd_train['spikes'], shd_train['labels'], batch_size = 64, step_size = 100, input_size = tonic.datasets.SHD.sensor_size[0], max_time = 1.4)
 shd_test = data_mod(shd_test['spikes'], shd_test['labels'], batch_size = 1, step_size = 100, input_size = tonic.datasets.SHD.sensor_size[0], max_time = 1.4)
 print('DONE')
 
@@ -213,7 +213,7 @@ class LSNN(nn.Module):
         T_adp = self.act(self.o_T_adp(L3 + self.b3))
         self.u3, self.spk_out, self.b3 =  self.update_params(L3, self.u3, self.spk_out, T_m, T_adp, self.b3)
 
-model = LSNN(700, [256, 64], 20, 32).to(device)
+model = LSNN(700, [256, 64], 20, 64).to(device)
 
 model_u = []
 model_spk = []
@@ -222,7 +222,7 @@ shd_train = shd_train[:train_size]
 
 print('TRAINING THE MODEL...')
 for _ in range(1, 2):
-    progress_bar = tqdm(total = len(shd_train), desc='Epoch {}'.format(_))
+    progress_bar = tqdm(total = len(shd_train), desc = 'Epoch {}'.format(_))
     for batch in shd_train:
         inputs, labels = batch
         b_size, seq_num, i_size = inputs.shape
