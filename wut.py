@@ -254,8 +254,8 @@ for _ in range(start_epoch, 10):
             model_spk.append(model.spk_out)
 
             del xx
-            save_checkpoint(model, _, batch_idx)
             torch.cuda.empty_cache()
+            save_checkpoint(model, _, batch_idx)
         
         progress_bar.update(1)
     progress_bar.close()
