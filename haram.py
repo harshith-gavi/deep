@@ -224,5 +224,6 @@ for _ in range(1, 5):
             del xx
         
         progress_bar.update(1)
+        del inputs, labels
 
     progress_bar.close()
