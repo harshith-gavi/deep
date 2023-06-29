@@ -1,7 +1,7 @@
 # !pip install tonic
 # !pip install snntorch
 # !pip install torchplot
-print('IMPORTING LIBRARIES...', end = '\t')
+print('IMPORTING LIBRARIES...')
 import h5py
 import numpy as np
 import matplotlib.pyplot as plt
@@ -21,10 +21,9 @@ import snntorch as snn
 from snntorch import spikeplot as splt
 from snntorch import spikegen
 
-print('DONE')
-
 datapath = '../data/'
 device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
+print('Using {}'.format(device))
 
 def data_mod(X, y, batch_size, step_size, input_size, max_time, shuffle=True):
     '''
@@ -71,7 +70,7 @@ def data_mod(X, y, batch_size, step_size, input_size, max_time, shuffle=True):
 
     return mod_data
 
-print('PREPROCESSING DATA...', end = '\t')
+print('PREPROCESSING DATA...')
 # shd_train = tonic.datasets.SHD(save_to = datapath + 'train_data')
 # shd_test = tonic.datasets.SHD(save_to = datapath + 'test_data', train = False)
 
@@ -80,7 +79,6 @@ shd_test = h5py.File(datapath + 'test_data/SHD/shd_test.h5', 'r')
 
 shd_train = data_mod(shd_train['spikes'], shd_train['labels'], batch_size = 256, step_size = 100, input_size = tonic.datasets.SHD.sensor_size[0], max_time = 1.4)
 shd_test = data_mod(shd_test['spikes'], shd_test['labels'], batch_size = 1, step_size = 100, input_size = tonic.datasets.SHD.sensor_size[0], max_time = 1.4)
-print('DONE')
 
 #Straight from the github
 
@@ -123,9 +121,9 @@ class LSNN(nn.Module):
         self.thr = 0.5                                          # Threshold
         self.thr_min = 0.01                                     # Threshold Baseline
 
-        self.u1 = torch.zeros(b_size, h_size[0]).to(device)                # Membrane Potentials
-        self.u2 = torch.zeros(b_size, h_size[1]).to(device)
-        self.u3 = torch.zeros(b_size, o_size).to(device)
+        self.u1 = torch.zeros(b_size, h_size[0])                # Membrane Potentials
+        self.u2 = torch.zeros(b_size, h_size[1])
+        self.u3 = torch.zeros(b_size, o_size)
 
         self.b1 = torch.zeros(b_size, h_size[0]).to(device)
         self.b2 = torch.zeros(b_size, h_size[1]).to(device)
@@ -217,8 +215,6 @@ model.to(device)
 
 model_u = []
 model_spk = []
-train_size = int(input('Enter a training data size: '))
-shd_train = shd_train[:train_size]
 
 print('TRAINING THE MODEL...')
 for _ in range(1, 2):
