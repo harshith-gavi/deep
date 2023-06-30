@@ -235,5 +235,6 @@ for _ in range(1, 5):
             del xx
         progress_bar.update(1)
         torch.cuda.mem_get_info
+        print("1")
 
     progress_bar.close()
