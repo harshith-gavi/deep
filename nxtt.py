@@ -198,7 +198,7 @@ class LSNN(nn.Module):
         INPUT: Spikes
         OUTPUT: Spikes
         """
-        x_t.to(device_2)
+        x_t = x_t.to(device_2)
         L1 = self.syn1(x_t)
         T_m = self.act(self.l1_T_m(L1 + self.u1))
         T_adp = self.act(self.l1_T_adp(L1 + self.b1))
