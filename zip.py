@@ -230,7 +230,7 @@ for _ in range(1, 5):
 
         for i in range(seq_num):
             xx = inputs.to_dense()[:, i, :]
-            model.FPTT(xx)
+            model.FPTT(xx).to(device_1)
             model_spk.append(model.spk_out)
             del xx
         progress_bar.update(1)
