@@ -1,4 +1,4 @@
-# !pip install tonic
+cd ..# !pip install tonic
 # !pip install snntorch
 # !pip install torchplot
 print('IMPORTING LIBRARIES...')
@@ -140,8 +140,8 @@ class LSNN(nn.Module):
         self.syn2 = nn.Linear(h_size[0], h_size[1])
         self.syn3 = nn.Linear(h_size[1], o_size)
 
-        self.l1_T_adp = nn.Linear(h_size[0], h_size[0])             # Adaptation Time Constant
-        self.l1_T_m = nn.Linear(h_size[0], h_size[0])               # Membrane Time Constant
+        self.l1_T_adp = nn.Linear(h_size[0], h_size[0]).to(device_1)             # Adaptation Time Constant
+        self.l1_T_m = nn.Linear(h_size[0], h_size[0]).to(device_1)               # Membrane Time Constant
 
         self.l2_T_adp = nn.Linear(h_size[1], h_size[1])
         self.l2_T_m = nn.Linear(h_size[1], h_size[1])
