@@ -213,8 +213,7 @@ class LSNN(nn.Module):
         T_m = self.act(self.o_T_m(L3 + self.u3))
         T_adp = self.act(self.o_T_adp(L3 + self.b3))
         self.u3, self.spk_out, self.b3 =  self.update_params(L3, self.u3, self.spk_out, T_m, T_adp, self.b3)
-        del x_t
-        torch.cuda.empty_cache()
+        del x_t, T_m, T_adp
 
 model = LSNN(700, [256, 64], 20, 256)
 model.to(device_2)
