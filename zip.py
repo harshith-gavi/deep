@@ -80,7 +80,7 @@ print('PREPROCESSING DATA...')
 shd_train = h5py.File(datapath + 'train_data/SHD/shd_train.h5', 'r')
 shd_test = h5py.File(datapath + 'test_data/SHD/shd_test.h5', 'r')
 
-shd_train = data_mod(shd_train['spikes'], shd_train['labels'], batch_size = 256, step_size = 100, input_size = tonic.datasets.SHD.sensor_size[0], max_time = 1.4)
+shd_train = data_mod(shd_train['spikes'], shd_train['labels'], batch_size = 128, step_size = 100, input_size = tonic.datasets.SHD.sensor_size[0], max_time = 1.4)
 shd_test = data_mod(shd_test['spikes'], shd_test['labels'], batch_size = 1, step_size = 100, input_size = tonic.datasets.SHD.sensor_size[0], max_time = 1.4)
 
 #Straight from the github
@@ -215,7 +215,7 @@ class LSNN(nn.Module):
         self.u3, self.spk_out, self.b3 =  self.update_params(L3, self.u3, self.spk_out, T_m, T_adp, self.b3)
         del x_t, T_m, T_adp, L1, L2, L3
 
-model = LSNN(700, [256, 64], 20, 256)
+model = LSNN(700, [256, 64], 20, 128)
 model.to(device_2)
 
 model_u = []
