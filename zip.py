@@ -234,7 +234,6 @@ for _ in range(1, 5):
             model_spk.append(model.spk_out)
             del xx
         progress_bar.update(1)
-        torch.cuda.mem_get_info
-        print("1")
+        torch.cuda.mem_get_info(device=device_1)
 
     progress_bar.close()
