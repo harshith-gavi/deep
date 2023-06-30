@@ -190,6 +190,7 @@ class LSNN(nn.Module):
         spk = act_fun_adp(u_t - thr)
         u_t = u_t * (1 - spk) + (self.u_r * spk)
 
+        del alpha, rho, thr, du
         return u_t, spk, b_t
 
     def FPTT(self, x_t):
@@ -234,6 +235,7 @@ for _ in range(1, 5):
             model_spk.append(model.spk_out)
             del xx
         progress_bar.update(1)
+        torch.cuda.empty_cache()
         print(torch.cuda.memory_reserved(device=device_1))
         print(torch.cuda.memory_reserved(device=device_2))
 
