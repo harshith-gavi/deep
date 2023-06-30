@@ -23,8 +23,8 @@ import torch.utils.checkpoint as checkpoint
 # from snntorch import spikegen
 
 datapath = '../data/'
-device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
-
+# device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
+device_0 = torch.device('cpu')
 device_1 = torch.device('cuda:0')  # First CUDA device
 device_2 = torch.device('cuda:1')  # Second CUDA device
 
@@ -61,13 +61,13 @@ def data_mod(X, y, batch_size, step_size, input_size, max_time, shuffle=True):
             coo[1].extend(times)
             coo[2].extend(units)
 
-        i = torch.LongTensor(coo).to(device_1)
-        v = torch.FloatTensor(np.ones(len(coo[0]))).to(device_1)
+        i = torch.LongTensor(coo).to(device_0)
+        v = torch.FloatTensor(np.ones(len(coo[0]))).to(device_0)
 
-        X_batch = torch.sparse.FloatTensor(i, v, torch.Size([batch_size,step_size,input_size])).to(device_1)
-        y_batch = torch.tensor(labels[batch_index], device = device_1)
+        X_batch = torch.sparse.FloatTensor(i, v, torch.Size([batch_size,step_size,input_size])).to(device_0)
+        y_batch = torch.tensor(labels[batch_index], device = device_0)
 
-        mod_data.append((X_batch.to(device_1), y_batch.to(device_1)))
+        mod_data.append((X_batch.to(device_0), y_batch.to(device_0)))
 
         counter += 1
 
@@ -125,15 +125,15 @@ class LSNN(nn.Module):
         self.thr_min = 0.01                                         # Threshold Baseline
 
         self.u1 = torch.zeros(b_size, h_size[0]).to(device_2)         # Membrane Potentials
-        self.u2 = torch.zeros(b_size, h_size[1]).to(device_2)
+        self.u2 = torch.zeros(b_size, h_size[1]).to(device_1)
         self.u3 = torch.zeros(b_size, o_size).to(device_2)
 
         self.b1 = torch.zeros(b_size, h_size[0]).to(device_2)
-        self.b2 = torch.zeros(b_size, h_size[1]).to(device_2)
+        self.b2 = torch.zeros(b_size, h_size[1]).to(device_1)
         self.b3 = torch.zeros(b_size, o_size).to(device_2)
 
         self.spk1 = torch.zeros(b_size, h_size[0]).to(device_2)       # Spikes
-        self.spk2 = torch.zeros(b_size, h_size[1]).to(device_2)
+        self.spk2 = torch.zeros(b_size, h_size[1]).to(device_1)
         self.spk_out = torch.zeros(b_size, o_size).to(device_2)
 
         self.syn1 = nn.Linear(i_size, h_size[0])                    # Synapses/Connections
@@ -205,11 +205,13 @@ class LSNN(nn.Module):
         self.u1, self.spk1, self.b1 = self.update_params(L1, self.u1, self.spk1, T_m, T_adp, self.b1)
 
         L2 = self.syn2(self.spk1)
+        L2 = L2.to(device_1)
         T_m = self.act(self.l2_T_m(L2 + self.u2))
         T_adp = self.act(self.l2_T_adp(L2 + self.b2))
         self.u2, self.spk2, self.b2  = self.update_params(L2, self.u2, self.spk2, T_m, T_adp, self.b2)
 
         L3 = self.syn3(self.spk2)
+        L3 = L3.to(device_2)
         T_m = self.act(self.o_T_m(L3 + self.u3))
         T_adp = self.act(self.o_T_adp(L3 + self.b3))
         self.u3, self.spk_out, self.b3 =  self.update_params(L3, self.u3, self.spk_out, T_m, T_adp, self.b3)
