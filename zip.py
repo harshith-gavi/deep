@@ -136,7 +136,7 @@ class LSNN(nn.Module):
         self.spk2 = torch.zeros(b_size, h_size[1]).to(device_2)
         self.spk_out = torch.zeros(b_size, o_size).to(device_2)
 
-        self.syn1 = nn.Linear(i_size, h_size[0])                    # Synapses/Connections
+        self.syn1 = nn.Linear(i_size, h_size[0]).to(device_1)                    # Synapses/Connections
         self.syn2 = nn.Linear(h_size[0], h_size[1])
         self.syn3 = nn.Linear(h_size[1], o_size)
 
