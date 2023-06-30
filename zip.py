@@ -1,4 +1,4 @@
-cd ..# !pip install tonic
+# !pip install tonic
 # !pip install snntorch
 # !pip install torchplot
 print('IMPORTING LIBRARIES...')
