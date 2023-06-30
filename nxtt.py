@@ -233,8 +233,7 @@ for _ in range(1, 5):
             model.FPTT(xx)
             model_spk.append(model.spk_out)
             del xx
-            torch.cuda.empty_cache()
-        
+        torch.cuda.empty_cache()
         progress_bar.update(1)
 
     progress_bar.close()
