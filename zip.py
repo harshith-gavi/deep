@@ -137,17 +137,17 @@ class LSNN(nn.Module):
         self.spk_out = torch.zeros(b_size, o_size).to(device_2)
 
         self.syn1 = nn.Linear(i_size, h_size[0]).to(device_1)                    # Synapses/Connections
-        self.syn2 = nn.Linear(h_size[0], h_size[1])
-        self.syn3 = nn.Linear(h_size[1], o_size)
+        self.syn2 = nn.Linear(h_size[0], h_size[1]).to(device_2)
+        self.syn3 = nn.Linear(h_size[1], o_size).to(device_2)
 
         self.l1_T_adp = nn.Linear(h_size[0], h_size[0]).to(device_1)             # Adaptation Time Constant
         self.l1_T_m = nn.Linear(h_size[0], h_size[0]).to(device_1)               # Membrane Time Constant
 
-        self.l2_T_adp = nn.Linear(h_size[1], h_size[1])
-        self.l2_T_m = nn.Linear(h_size[1], h_size[1])
+        self.l2_T_adp = nn.Linear(h_size[1], h_size[1]).to(device_2)
+        self.l2_T_m = nn.Linear(h_size[1], h_size[1]).to(device_2)
 
-        self.o_T_adp = nn.Linear(o_size, o_size)
-        self.o_T_m = nn.Linear(o_size, o_size)
+        self.o_T_adp = nn.Linear(o_size, o_size).to(device_2)
+        self.o_T_m = nn.Linear(o_size, o_size).to(device_2)
 
         self.act = nn.Sigmoid()
 
