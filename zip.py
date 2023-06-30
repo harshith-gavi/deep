@@ -149,7 +149,7 @@ class LSNN(nn.Module):
         self.o_T_adp = nn.Linear(o_size, o_size).to(device_2)
         self.o_T_m = nn.Linear(o_size, o_size).to(device_2)
 
-        self.act = nn.Sigmoid()
+        act = nn.Sigmoid()
 
         nn.init.ones_(self.syn1.weight)                             # Parameter Initialisation
         nn.init.zeros_(self.syn1.bias)
@@ -200,19 +200,19 @@ class LSNN(nn.Module):
         """
         x_t = x_t.to(device_1)
         L1 = self.syn1(x_t)
-        T_m = self.act(self.l1_T_m(L1 + self.u1))
-        T_adp = self.act(self.l1_T_adp(L1 + self.b1))
+        T_m = act(self.l1_T_m(L1 + self.u1))
+        T_adp = act(self.l1_T_adp(L1 + self.b1))
         self.u1, self.spk1, self.b1 = self.update_params(L1, self.u1, self.spk1, T_m, T_adp, self.b1)
         temp = self.spk1
         temp = temp.to(device_2)
         L2 = self.syn2(temp)
-        T_m = self.act(self.l2_T_m(L2 + self.u2))
-        T_adp = self.act(self.l2_T_adp(L2 + self.b2))
+        T_m = act(self.l2_T_m(L2 + self.u2))
+        T_adp = act(self.l2_T_adp(L2 + self.b2))
         self.u2, self.spk2, self.b2  = self.update_params(L2, self.u2, self.spk2, T_m, T_adp, self.b2)
 
         L3 = self.syn3(self.spk2)
-        T_m = self.act(self.o_T_m(L3 + self.u3))
-        T_adp = self.act(self.o_T_adp(L3 + self.b3))
+        T_m = act(self.o_T_m(L3 + self.u3))
+        T_adp = act(self.o_T_adp(L3 + self.b3))
         self.u3, self.spk_out, self.b3 =  self.update_params(L3, self.u3, self.spk_out, T_m, T_adp, self.b3)
         del x_t, T_m, T_adp, L1, L2, L3, temp
 
