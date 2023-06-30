@@ -216,7 +216,6 @@ class LSNN(nn.Module):
         del x_t, T_m, T_adp, L1, L2, L3
 
 model = LSNN(700, [256, 64], 20, 128)
-model.to(device_2)
 
 model_u = []
 model_spk = []
@@ -230,7 +229,7 @@ for _ in range(1, 5):
 
         for i in range(seq_num):
             xx = inputs.to_dense()[:, i, :]
-            model.FPTT(xx).to(device_1)
+            model.FPTT(xx)
             model_spk.append(model.spk_out)
             del xx
         progress_bar.update(1)
