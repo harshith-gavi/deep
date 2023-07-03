@@ -220,7 +220,7 @@ model = LSNN(700, [256, 64], 20, 128)
 
 model_u = []
 model_spk = []
-shd_train = shd_train[:(0.8 * len(shd_train))]
+shd_train = shd_train[:int(0.8 * len(shd_train))]
 
 print('TRAINING THE MODEL...')
 for _ in range(1, 5):
