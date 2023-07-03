@@ -238,7 +238,9 @@ for _ in range(1, 5):
             model_spk.append(model.spk_out)
             del xx
         progress_bar.update(1)
+    print('Available CUDA memory: ', torch.cuda.mem_get_info())
     torch.cuda.empty_cache()
+    print('Available CUDA memory: ', torch.cuda.mem_get_info())
 
     progress_bar.close()
 
