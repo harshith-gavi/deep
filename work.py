@@ -213,6 +213,7 @@ class LSNN(nn.Module):
         L3 = self.syn3(self.spk2)
         T_m = self.act(self.o_T_m(L3 + self.u3))
         T_adp = self.act(self.o_T_adp(L3 + self.b3))
+        self.spk_out = self.spk_out.to(device_2)
         self.u3, self.spk_out, self.b3 =  update_params(L3, self.u3, self.spk_out, T_m, T_adp, self.b3, self.thr_min, self.u_r)
         self.spk_out = self.spk_out.to(device_1)
         
