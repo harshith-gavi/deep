@@ -232,7 +232,7 @@ for _ in range(1, 5):
         for i in range(seq_num):
             xx = inputs.to_dense()[:, i, :]
             model.FPTT(xx)
-            print(model.spk_out.shape)
+            print(model.spk_out[0])
             model_spk.append(model.spk_out)
             del xx
         progress_bar.update(1)
