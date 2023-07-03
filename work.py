@@ -1,11 +1,6 @@
-# !pip install tonic
-# !pip install snntorch
-# !pip install torchplot
 print('IMPORTING LIBRARIES...')
 import h5py
 import numpy as np
-# import matplotlib.pyplot as plt
-# import itertools
 from tqdm import tqdm
 
 import tonic
@@ -13,17 +8,12 @@ import tonic.transforms as ttr
 
 import torch
 import torch.nn as nn
-# import torchplot as tp
+
 from torch.utils.data import DataLoader
-# from torchvision import datasets, transforms
+
 import torch.utils.checkpoint as checkpoint
 
-# import snntorch as snn
-# from snntorch import spikeplot as splt
-# from snntorch import spikegen
-
 datapath = '../data/'
-# device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
 device_0 = torch.device('cpu')
 device_1 = torch.device('cuda:0')  # First CUDA device
 device_2 = torch.device('cuda:1')  # Second CUDA device
@@ -124,24 +114,24 @@ class LSNN(nn.Module):
         self.thr = 0.5                                              # Threshold
         self.thr_min = 0.01                                         # Threshold Baseline
 
-        self.u1 = torch.zeros(b_size, h_size[0]).to(device_1)         # Membrane Potentials
+        self.u1 = torch.zeros(b_size, h_size[0]).to(device_2)         # Membrane Potentials
         self.u2 = torch.zeros(b_size, h_size[1]).to(device_2)
         self.u3 = torch.zeros(b_size, o_size).to(device_2)
 
-        self.b1 = torch.zeros(b_size, h_size[0]).to(device_1)
+        self.b1 = torch.zeros(b_size, h_size[0]).to(device_2)
         self.b2 = torch.zeros(b_size, h_size[1]).to(device_2)
         self.b3 = torch.zeros(b_size, o_size).to(device_2)
 
-        self.spk1 = torch.zeros(b_size, h_size[0]).to(device_1)       # Spikes
+        self.spk1 = torch.zeros(b_size, h_size[0]).to(device_2)       # Spikes
         self.spk2 = torch.zeros(b_size, h_size[1]).to(device_2)
         self.spk_out = torch.zeros(b_size, o_size).to(device_2)
 
         self.syn1 = nn.Linear(i_size, h_size[0]).to(device_1)                    # Synapses/Connections
-        self.syn2 = nn.Linear(h_size[0], h_size[1]).to(device_2)
-        self.syn3 = nn.Linear(h_size[1], o_size).to(device_2)
+        self.syn2 = nn.Linear(h_size[0], h_size[1]).to(device_1)
+        self.syn3 = nn.Linear(h_size[1], o_size).to(device_1)
 
-        self.l1_T_adp = nn.Linear(h_size[0], h_size[0]).to(device_1)             # Adaptation Time Constant
-        self.l1_T_m = nn.Linear(h_size[0], h_size[0]).to(device_1)               # Membrane Time Constant
+        self.l1_T_adp = nn.Linear(h_size[0], h_size[0]).to(device_2)             # Adaptation Time Constant
+        self.l1_T_m = nn.Linear(h_size[0], h_size[0]).to(device_2)               # Membrane Time Constant
 
         self.l2_T_adp = nn.Linear(h_size[1], h_size[1]).to(device_2)
         self.l2_T_m = nn.Linear(h_size[1], h_size[1]).to(device_2)
