@@ -7,6 +7,7 @@ import numpy as np
 # import matplotlib.pyplot as plt
 # import itertools
 from tqdm import tqdm
+import gc
 
 import tonic
 import tonic.transforms as ttr
@@ -215,7 +216,6 @@ class LSNN(nn.Module):
         T_adp = self.act(self.o_T_adp(L3 + self.b3))
         self.u3, self.spk_out, self.b3 =  self.update_params(L3, self.u3, self.spk_out, T_m, T_adp, self.b3)
         del x_t, T_m, T_adp, L1, L2, L3
-        torch.cuda.empty_cache()
 
 print('Available CUDA memory: ', torch.cuda.mem_get_info())
 print('Creating model...')
@@ -242,6 +242,7 @@ for _ in range(1, 5):
     progress_bar.close()
     
     print('Available CUDA memory: ', torch.cuda.mem_get_info())
+    gc.collect()
     torch.cuda.empty_cache()
     print('Available CUDA memory: ', torch.cuda.mem_get_info())
 
