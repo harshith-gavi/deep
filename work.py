@@ -154,7 +154,7 @@ class LSNN(nn.Module):
 
         self.spk1 = torch.zeros(b_size, h_size[0]).to(device_1)       # Spikes
         self.spk2 = torch.zeros(b_size, h_size[1]).to(device_2)
-        self.spk_out = torch.zeros(b_size, o_size).to(device_1)
+        self.spk_out = torch.zeros(b_size, o_size).to(device_2)
 
         self.syn1 = nn.Linear(i_size, h_size[0]).to(device_1)                    # Synapses/Connections
         self.syn2 = nn.Linear(h_size[0], h_size[1]).to(device_2)
@@ -214,7 +214,9 @@ class LSNN(nn.Module):
         T_m = self.act(self.o_T_m(L3 + self.u3))
         T_adp = self.act(self.o_T_adp(L3 + self.b3))
         self.u3, self.spk_out, self.b3 =  update_params(L3, self.u3, self.spk_out, T_m, T_adp, self.b3, self.thr_min, self.u_r)
-        del x_t, T_m, T_adp, L1, L2, L3
+        self.spk_out = self.spk_out.to(device_1)
+        
+        del x_t, T_m, T_adp, L1, L2, L3, Spk
 
 model = LSNN(700, [256, 64], 20, 128)
 
