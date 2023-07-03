@@ -219,7 +219,7 @@ class LSNN(nn.Module):
 print('Available CUDA memory: ', torch.cuda.mem_get_info())
 print('Creating model...')
 model = LSNN(700, [256, 64], 20, 128)
-print('Available CUDA memory: 'torch.cuda.mem_get_info())
+print('Available CUDA memory: ', torch.cuda.mem_get_info())
 
 model_u = []
 model_spk = []
