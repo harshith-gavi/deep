@@ -214,7 +214,6 @@ class LSNN(nn.Module):
         T_m = self.act(self.o_T_m(L3 + self.u3))
         T_adp = self.act(self.o_T_adp(L3 + self.b3))
         self.u3, self.spk_out, self.b3 =  self.update_params(L3, self.u3, self.spk_out, T_m, T_adp, self.b3)
-        print(self.spk_out)
         del x_t, T_m, T_adp, L1, L2, L3
 
 model = LSNN(700, [256, 64], 20, 128)
@@ -233,6 +232,7 @@ for _ in range(1, 5):
         for i in range(seq_num):
             xx = inputs.to_dense()[:, i, :]
             model.FPTT(xx)
+            print(model.spk_out.shape)
             model_spk.append(model.spk_out)
             del xx
         progress_bar.update(1)
