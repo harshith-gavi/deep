@@ -122,9 +122,9 @@ class LSNN(nn.Module):
         self.b2 = torch.zeros(b_size, h_size[1]).to(device_2)
         self.b3 = torch.zeros(b_size, o_size).to(device_2)
 
-        self.spk1 = torch.zeros(b_size, h_size[0]).to(device_2)       # Spikes
-        self.spk2 = torch.zeros(b_size, h_size[1]).to(device_2)
-        self.spk_out = torch.zeros(b_size, o_size).to(device_2)
+        self.spk1 = torch.zeros(b_size, h_size[0]).to(device_1)       # Spikes
+        self.spk2 = torch.zeros(b_size, h_size[1]).to(device_1)
+        self.spk_out = torch.zeros(b_size, o_size).to(device_1)
 
         self.syn1 = nn.Linear(i_size, h_size[0]).to(device_1)                    # Synapses/Connections
         self.syn2 = nn.Linear(h_size[0], h_size[1]).to(device_1)
@@ -194,15 +194,13 @@ class LSNN(nn.Module):
         T_m = self.act(self.l1_T_m(L1 + self.u1))
         T_adp = self.act(self.l1_T_adp(L1 + self.b1))
         self.u1, self.spk1, self.b1 = self.update_params(L1, self.u1, self.spk1, T_m, T_adp, self.b1)
-        temp = self.spk1
-        temp = temp.to(device_1)
+
         L2 = self.syn2(temp)
         L2 = L2.to(device_2)
         T_m = self.act(self.l2_T_m(L2 + self.u2))
         T_adp = self.act(self.l2_T_adp(L2 + self.b2))
         self.u2, self.spk2, self.b2  = self.update_params(L2, self.u2, self.spk2, T_m, T_adp, self.b2)
-        temp = self.spk2
-        temp = temp.to(device_1)
+
         L3 = self.syn3(temp)
         L3 = L3.to(device_2)
         T_m = self.act(self.o_T_m(L3 + self.u3))
