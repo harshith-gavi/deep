@@ -148,11 +148,11 @@ class LSNN(nn.Module):
         self.u2 = torch.zeros(b_size, h_size[1]).to(device_2)
         self.u3 = torch.zeros(b_size, o_size).to(device_2)
 
-        self.b1 = torch.zeros(b_size, h_size[0]).to(device_2)
+        self.b1 = torch.zeros(b_size, h_size[0]).to(device_1)
         self.b2 = torch.zeros(b_size, h_size[1]).to(device_2)
         self.b3 = torch.zeros(b_size, o_size).to(device_2)
 
-        self.spk1 = torch.zeros(b_size, h_size[0]).to(device_2)       # Spikes
+        self.spk1 = torch.zeros(b_size, h_size[0]).to(device_1)       # Spikes
         self.spk2 = torch.zeros(b_size, h_size[1]).to(device_2)
         self.spk_out = torch.zeros(b_size, o_size).to(device_1)
 
@@ -200,6 +200,7 @@ class LSNN(nn.Module):
         """
         x_t = x_t.to(device_1)
         L1 = self.syn1(x_t)
+        L1 = L1.to(device_2)
         T_m = self.act(self.l1_T_m(L1 + self.u1))
         T_adp = self.act(self.l1_T_adp(L1 + self.b1))
         self.u1, self.spk1, self.b1 = update_params(L1, self.u1, self.spk1, T_m, T_adp, self.b1, self.thr_min, self.u_r)
