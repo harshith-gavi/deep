@@ -1,6 +1,11 @@
+# !pip install tonic
+# !pip install snntorch
+# !pip install torchplot
 print('IMPORTING LIBRARIES...')
 import h5py
 import numpy as np
+# import matplotlib.pyplot as plt
+# import itertools
 from tqdm import tqdm
 
 import tonic
@@ -8,12 +13,17 @@ import tonic.transforms as ttr
 
 import torch
 import torch.nn as nn
-
+# import torchplot as tp
 from torch.utils.data import DataLoader
-
+# from torchvision import datasets, transforms
 import torch.utils.checkpoint as checkpoint
 
+# import snntorch as snn
+# from snntorch import spikeplot as splt
+# from snntorch import spikegen
+
 datapath = '../data/'
+# device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
 device_0 = torch.device('cpu')
 device_1 = torch.device('cuda:0')  # First CUDA device
 device_2 = torch.device('cuda:1')  # Second CUDA device
@@ -106,6 +116,26 @@ class ActFun_adp(torch.autograd.Function):
 
 act_fun_adp = ActFun_adp.apply
 
+def update_params(self, op, u_t, spk, t_m, t_adp, b_t):
+    """
+    Used to update the parameters during FPTT
+    INPUT: Layer output, Membrane Potential, Spikes, T_adp, T_m and Intermediate State Variable (b_t)
+    OUTPUT: Membrane Potential, Spikes and Intermediate State Variable (b_t)
+    """
+    alpha = t_m
+    rho = t_adp
+
+    b_t = (rho * b_t) + ((1 - rho) * spk)
+    thr = self.thr_min + (1.8 * b_t)
+
+    du = (-u_t + op) / alpha
+    u_t = u_t + du
+
+    spk = act_fun_adp(u_t - thr)
+    u_t = u_t * (1 - spk) + (self.u_r * spk)
+
+    return u_t, spk, b_t
+
 class LSNN(nn.Module):
     def __init__(self, i_size, h_size, o_size, b_size):
         super(LSNN, self).__init__()
@@ -114,24 +144,24 @@ class LSNN(nn.Module):
         self.thr = 0.5                                              # Threshold
         self.thr_min = 0.01                                         # Threshold Baseline
 
-        self.u1 = torch.zeros(b_size, h_size[0]).to(device_2)         # Membrane Potentials
+        self.u1 = torch.zeros(b_size, h_size[0]).to(device_1)         # Membrane Potentials
         self.u2 = torch.zeros(b_size, h_size[1]).to(device_2)
         self.u3 = torch.zeros(b_size, o_size).to(device_2)
 
-        self.b1 = torch.zeros(b_size, h_size[0]).to(device_2)
+        self.b1 = torch.zeros(b_size, h_size[0]).to(device_1)
         self.b2 = torch.zeros(b_size, h_size[1]).to(device_2)
         self.b3 = torch.zeros(b_size, o_size).to(device_2)
 
-        self.spk1 = torch.zeros(b_size, h_size[0]).to(device_2)       # Spikes
+        self.spk1 = torch.zeros(b_size, h_size[0]).to(device_1)       # Spikes
         self.spk2 = torch.zeros(b_size, h_size[1]).to(device_2)
-        self.spk_out = torch.zeros(b_size, o_size).to(device_1)
+        self.spk_out = torch.zeros(b_size, o_size).to(device_2)
 
         self.syn1 = nn.Linear(i_size, h_size[0]).to(device_1)                    # Synapses/Connections
-        self.syn2 = nn.Linear(h_size[0], h_size[1]).to(device_1)
-        self.syn3 = nn.Linear(h_size[1], o_size).to(device_1)
+        self.syn2 = nn.Linear(h_size[0], h_size[1]).to(device_2)
+        self.syn3 = nn.Linear(h_size[1], o_size).to(device_2)
 
-        self.l1_T_adp = nn.Linear(h_size[0], h_size[0]).to(device_2)             # Adaptation Time Constant
-        self.l1_T_m = nn.Linear(h_size[0], h_size[0]).to(device_2)               # Membrane Time Constant
+        self.l1_T_adp = nn.Linear(h_size[0], h_size[0]).to(device_1)             # Adaptation Time Constant
+        self.l1_T_m = nn.Linear(h_size[0], h_size[0]).to(device_1)               # Membrane Time Constant
 
         self.l2_T_adp = nn.Linear(h_size[1], h_size[1]).to(device_2)
         self.l2_T_m = nn.Linear(h_size[1], h_size[1]).to(device_2)
@@ -162,26 +192,6 @@ class LSNN(nn.Module):
         nn.init.zeros_(self.o_T_adp.bias)
         nn.init.zeros_(self.o_T_m.bias)
 
-    def update_params(self, op, u_t, spk, t_m, t_adp, b_t):
-        """
-        Used to update the parameters
-        INPUT: Layer output, Membrane Potential, Spikes, T_adp, T_m and Intermediate State Variable (b_t)
-        OUTPUT: Membrane Potential, Spikes and Intermediate State Variable (b_t)
-        """
-        alpha = t_m
-        rho = t_adp
-
-        b_t = (rho * b_t) + ((1 - rho) * spk)
-        thr = self.thr_min + (1.8 * b_t)
-
-        du = (-u_t + op) / alpha
-        u_t = u_t + du
-
-        spk = act_fun_adp(u_t - thr)
-        u_t = u_t * (1 - spk) + (self.u_r * spk)
-
-        return u_t, spk, b_t
-
     def FPTT(self, x_t):
         """
         Used to train using Forward Pass Through Time Algorithm
@@ -190,27 +200,21 @@ class LSNN(nn.Module):
         """
         x_t = x_t.to(device_1)
         L1 = self.syn1(x_t)
-        L1 = L1.to(device_2)
         T_m = self.act(self.l1_T_m(L1 + self.u1))
         T_adp = self.act(self.l1_T_adp(L1 + self.b1))
-        self.u1, self.spk1, self.b1 = self.update_params(L1, self.u1, self.spk1, T_m, T_adp, self.b1)
-        
-        self.spk1 = self.spk1.to(device_1)
-        L2 = self.syn2(self.spk1)
-        L2 = L2.to(device_2)
+        self.u1, self.spk1, self.b1 = update_params(L1, self.u1, self.spk1, T_m, T_adp, self.b1)
+        temp = self.spk1
+        temp = temp.to(device_2)
+        L2 = self.syn2(temp)
         T_m = self.act(self.l2_T_m(L2 + self.u2))
         T_adp = self.act(self.l2_T_adp(L2 + self.b2))
-        self.u2, self.spk2, self.b2  = self.update_params(L2, self.u2, self.spk2, T_m, T_adp, self.b2)
-        
-        self.spk2 = self.spk2.to(device_1)
+        self.u2, self.spk2, self.b2  = update_params(L2, self.u2, self.spk2, T_m, T_adp, self.b2)
+
         L3 = self.syn3(self.spk2)
-        L3 = L3.to(device_2)
         T_m = self.act(self.o_T_m(L3 + self.u3))
         T_adp = self.act(self.o_T_adp(L3 + self.b3))
-        Spk = self.spk_out
-        Spk = Spk.to(device_2)
-        self.u3, self.spk_out, self.b3 =  self.update_params(L3, self.u3, Spk, T_m, T_adp, self.b3)
-        del x_t, T_m, T_adp, L1, L2, L3, Spk
+        self.u3, self.spk_out, self.b3 =  update_params(L3, self.u3, self.spk_out, T_m, T_adp, self.b3)
+        del x_t, T_m, T_adp, L1, L2, L3
 
 model = LSNN(700, [256, 64], 20, 128)
 
