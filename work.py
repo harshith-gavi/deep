@@ -223,7 +223,7 @@ model_spk = []
 shd_train = shd_train[:int(0.8 * len(shd_train))]
 
 print('TRAINING THE MODEL...')
-for _ in range(1, 5):
+for _ in range(1, 2):
     progress_bar = tqdm(total = len(shd_train), desc = 'Epoch {}'.format(_))
     for batch in shd_train:
         inputs, labels = batch
@@ -232,10 +232,12 @@ for _ in range(1, 5):
         for i in range(seq_num):
             xx = inputs.to_dense()[:, i, :]
             model.FPTT(xx)
-            print(model.spk_out[0])
             model_spk.append(model.spk_out)
             del xx
         progress_bar.update(1)
         torch.cuda.empty_cache()
 
     progress_bar.close()
+
+for j in range(20):
+    print(model_spk[0][j])
