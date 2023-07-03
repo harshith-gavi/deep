@@ -244,9 +244,9 @@ for _ in range(1, 5):
     progress_bar.close()
     
     print('Available CUDA memory: ', torch.cuda.mem_get_info())
-    gc.collect()
-    torch.cuda.empty_cache()
-    print('Available CUDA memory: ', torch.cuda.mem_get_info())
+    # gc.collect()
+    # torch.cuda.empty_cache()
+    # print('Available CUDA memory: ', torch.cuda.mem_get_info())
 
 
 for j in range(20):
