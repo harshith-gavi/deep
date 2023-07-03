@@ -116,7 +116,7 @@ class ActFun_adp(torch.autograd.Function):
 
 act_fun_adp = ActFun_adp.apply
 
-def update_params(self, op, u_t, spk, t_m, t_adp, b_t):
+def update_params(op, u_t, spk, t_m, t_adp, b_t):
     """
     Used to update the parameters during FPTT
     INPUT: Layer output, Membrane Potential, Spikes, T_adp, T_m and Intermediate State Variable (b_t)
