@@ -148,7 +148,7 @@ class LSNN(nn.Module):
         self.u2 = torch.zeros(b_size, h_size[1]).to(device_2)
         self.u3 = torch.zeros(b_size, o_size).to(device_2)
 
-        self.b1 = torch.zeros(b_size, h_size[0]).to(device_1)
+        self.b1 = torch.zeros(b_size, h_size[0]).to(device_2)
         self.b2 = torch.zeros(b_size, h_size[1]).to(device_2)
         self.b3 = torch.zeros(b_size, o_size).to(device_2)
 
