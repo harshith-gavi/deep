@@ -116,26 +116,6 @@ class ActFun_adp(torch.autograd.Function):
 
 act_fun_adp = ActFun_adp.apply
 
-def update_params(op, u_t, spk, t_m, t_adp, b_t, thr_min, u_r):
-    """
-    Used to update the parameters during FPTT
-    INPUT: Layer output, Membrane Potential, Spikes, T_adp, T_m and Intermediate State Variable (b_t)
-    OUTPUT: Membrane Potential, Spikes and Intermediate State Variable (b_t)
-    """
-    alpha = t_m
-    rho = t_adp
-
-    b_t = (rho * b_t) + ((1 - rho) * spk)
-    thr = thr_min + (1.8 * b_t)
-
-    du = (-u_t + op) / alpha
-    u_t = u_t + du
-
-    spk = act_fun_adp(u_t - thr)
-    u_t = u_t * (1 - spk) + (u_r * spk)
-
-    return u_t, spk, b_t
-
 class LSNN(nn.Module):
     def __init__(self, i_size, h_size, o_size, b_size):
         super(LSNN, self).__init__()
@@ -154,7 +134,7 @@ class LSNN(nn.Module):
 
         self.spk1 = torch.zeros(b_size, h_size[0]).to(device_1)       # Spikes
         self.spk2 = torch.zeros(b_size, h_size[1]).to(device_2)
-        self.spk_out = torch.zeros(b_size, o_size).to(device_1)
+        self.spk_out = torch.zeros(b_size, o_size).to(device_2)
 
         self.syn1 = nn.Linear(i_size, h_size[0]).to(device_1)                    # Synapses/Connections
         self.syn2 = nn.Linear(h_size[0], h_size[1]).to(device_2)
@@ -192,6 +172,26 @@ class LSNN(nn.Module):
         nn.init.zeros_(self.o_T_adp.bias)
         nn.init.zeros_(self.o_T_m.bias)
 
+    def update_params(self, op, u_t, spk, t_m, t_adp, b_t):
+        """
+        Used to update the parameters
+        INPUT: Layer output, Membrane Potential, Spikes, T_adp, T_m and Intermediate State Variable (b_t)
+        OUTPUT: Membrane Potential, Spikes and Intermediate State Variable (b_t)
+        """
+        alpha = t_m
+        rho = t_adp
+
+        b_t = (rho * b_t) + ((1 - rho) * spk)
+        thr = self.thr_min + (1.8 * b_t)
+
+        du = (-u_t + op) / alpha
+        u_t = u_t + du
+
+        spk = act_fun_adp(u_t - thr)
+        u_t = u_t * (1 - spk) + (self.u_r * spk)
+
+        return u_t, spk, b_t
+
     def FPTT(self, x_t):
         """
         Used to train using Forward Pass Through Time Algorithm
@@ -202,27 +202,25 @@ class LSNN(nn.Module):
         L1 = self.syn1(x_t)
         T_m = self.act(self.l1_T_m(L1 + self.u1))
         T_adp = self.act(self.l1_T_adp(L1 + self.b1))
-        self.u1, self.spk1, self.b1 = update_params(L1, self.u1, self.spk1, T_m, T_adp, self.b1, self.thr_min, self.u_r)
-        Spk = self.spk1
-        Spk = Spk.to(device_2)
-        L2 = self.syn2(Spk)
+        self.u1, self.spk1, self.b1 = self.update_params(L1, self.u1, self.spk1, T_m, T_adp, self.b1)
+        temp = self.spk1
+        temp = temp.to(device_2)
+        L2 = self.syn2(temp)
         T_m = self.act(self.l2_T_m(L2 + self.u2))
         T_adp = self.act(self.l2_T_adp(L2 + self.b2))
-        self.u2, self.spk2, self.b2  = update_params(L2, self.u2, self.spk2, T_m, T_adp, self.b2, self.thr_min, self.u_r)
+        self.u2, self.spk2, self.b2  = self.update_params(L2, self.u2, self.spk2, T_m, T_adp, self.b2)
 
         L3 = self.syn3(self.spk2)
         T_m = self.act(self.o_T_m(L3 + self.u3))
         T_adp = self.act(self.o_T_adp(L3 + self.b3))
-        self.spk_out = self.spk_out.to(device_2)
-        self.u3, self.spk_out, self.b3 =  update_params(L3, self.u3, self.spk_out, T_m, T_adp, self.b3, self.thr_min, self.u_r)
-        self.spk_out = self.spk_out.to(device_1)
-        
-        del x_t, T_m, T_adp, L1, L2, L3, Spk
+        self.u3, self.spk_out, self.b3 =  self.update_params(L3, self.u3, self.spk_out, T_m, T_adp, self.b3)
+        del x_t, T_m, T_adp, L1, L2, L3
 
 model = LSNN(700, [256, 64], 20, 128)
 
 model_u = []
 model_spk = []
+shd_train = shd_train[:(0.8 * len(shd_train))]
 
 print('TRAINING THE MODEL...')
 for _ in range(1, 5):
