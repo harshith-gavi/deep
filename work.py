@@ -79,13 +79,13 @@ print('PREPROCESSING DATA...')
 # shd_train = tonic.datasets.SHD(save_to = datapath + 'train_data')
 # shd_test = tonic.datasets.SHD(save_to = datapath + 'test_data', train = False)
 parser = argparse.ArgumentParser()
-parser.add_argument('--batch_size', default=32)
+parser.add_argument('--batch_size', type=int, default=32)
 args = parser.parse_args()
 
 shd_train = h5py.File(datapath + 'train_data/SHD/shd_train.h5', 'r')
 shd_test = h5py.File(datapath + 'test_data/SHD/shd_test.h5', 'r')
 
-shd_train = data_mod(shd_train['spikes'], shd_train['labels'], batch_size = int(args.batch_size), step_size = 100, input_size = tonic.datasets.SHD.sensor_size[0], max_time = 1.4)
+shd_train = data_mod(shd_train['spikes'], shd_train['labels'], batch_size = args.batch_size, step_size = 100, input_size = tonic.datasets.SHD.sensor_size[0], max_time = 1.4)
 shd_test = data_mod(shd_test['spikes'], shd_test['labels'], batch_size = 1, step_size = 100, input_size = tonic.datasets.SHD.sensor_size[0], max_time = 1.4)
 
 #Straight from the github
