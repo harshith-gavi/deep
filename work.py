@@ -123,7 +123,7 @@ act_fun_adp = ActFun_adp.apply
 
 class LSNN(nn.Module):
     def __init__(self, i_size, h_size, o_size, b_size):
-        super(LSNN, self).__init__()
+        # super(LSNN, self).__init__()
 
         self.u_r = 0                                                # Resting Potential
         self.thr = 0.5                                              # Threshold
