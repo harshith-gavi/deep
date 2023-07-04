@@ -73,9 +73,10 @@ shd_train = data_mod(shd_train['spikes'], shd_train['labels'], batch_size = args
 shd_test = data_mod(shd_test['spikes'], shd_test['labels'], batch_size = 1, step_size = 100, input_size = tonic.datasets.SHD.sensor_size[0], max_time = 1.4)
 
 class LSNN(nn.Module):
-    def __init__(self, i_size, h_size, o_size, b_size):
+    def __init__(self, i_size, h_size, o_size):
         super(LSNN, self).__init__()
 
+        b_size = args.batch_size
         self.u_r = 0                                                # Resting Potential
         self.thr = 0.5                                              # Threshold
         self.thr_min = 0.01                                         # Threshold Baseline
@@ -175,7 +176,7 @@ class LSNN(nn.Module):
 
 print('Available CUDA memory: ', torch.cuda.mem_get_info())
 print('Creating model...')
-model = LSNN(700, [256, 64], 20, args.batch_size)
+model = LSNN(700, [256, 64], 20)
 print('Available CUDA memory: ', torch.cuda.mem_get_info())
 
 model_u = []
