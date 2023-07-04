@@ -197,11 +197,12 @@ for _ in range(1, 2):
             model_spk.append(model.spk_out)
             del xx
 
-            allez_var = list(locals().keys())
-            print(allez_var)
-            for var_name in allez_var:
-                if var_name != '_':
-                    del locals()[var_name]
+        allez_var = list(locals().keys())
+        print(allez_var)
+        for var_name in allez_var:
+            if var_name != '_':
+                del locals()[var_name]
+    
         progress_bar.update(1)
     progress_bar.close()
 
