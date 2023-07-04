@@ -174,10 +174,10 @@ class LSNN(nn.Module):
         self.u3, self.spk_out, self.b3 =  self.update_params(L3, self.u3, self.spk_out, T_m, T_adp, self.b3)
         del x_t, T_m, T_adp, L1, L2, L3
 
-print('Available CUDA memory: ', torch.cuda.mem_get_info())
+print('Available CUDA memory: ', torch.cuda.mem_get_info()[0] / (1024 * 1024))
 print('Creating model...')
 model = LSNN(700, [256, 64], 20)
-print('Available CUDA memory: ', torch.cuda.mem_get_info())
+print('Available CUDA memory: ', torch.cuda.mem_get_info()[0] / (1024 * 1024))
 
 model_u = []
 model_spk = []
@@ -199,7 +199,7 @@ for _ in range(1, 2):
     progress_bar.close()
 
 torch.cuda.empty_cache()
-print('Available CUDA memory: ', torch.cuda.mem_get_info())
+print('Available CUDA memory: ', torch.cuda.mem_get_info()[0] / (1024 * 1024))
 
 
 
