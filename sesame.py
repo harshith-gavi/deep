@@ -175,12 +175,6 @@ class LSNN(nn.Module):
         
         del x_t, T_m, T_adp, L1, L2, L3, temp
 
-        allez_var = list(locals().keys())
-        print(allez_var)
-        for var_name in allez_var:
-            if var_name != '_':
-                del locals()[var_name]
-
 print('Available CUDA memory: ', torch.cuda.mem_get_info()[0] / (1024 * 1024))
 print('Creating model...')
 model = LSNN(700, [256, 64], 20)
@@ -202,6 +196,12 @@ for _ in range(1, 2):
             model.FPTT(xx)
             model_spk.append(model.spk_out)
             del xx
+
+            allez_var = list(locals().keys())
+            print(allez_var)
+            for var_name in allez_var:
+                if var_name != '_':
+                    del locals()[var_name]
         progress_bar.update(1)
     progress_bar.close()
 
