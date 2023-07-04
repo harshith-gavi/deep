@@ -72,22 +72,6 @@ shd_test = h5py.File(datapath + 'test_data/SHD/shd_test.h5', 'r')
 shd_train = data_mod(shd_train['spikes'], shd_train['labels'], batch_size = args.batch_size, step_size = 100, input_size = tonic.datasets.SHD.sensor_size[0], max_time = 1.4)
 shd_test = data_mod(shd_test['spikes'], shd_test['labels'], batch_size = 1, step_size = 100, input_size = tonic.datasets.SHD.sensor_size[0], max_time = 1.4)
 
-#Straight from the github
-
-gamma = .5  # gradient scale
-lens = 0.3
-
-def gaussian(x, mu=0., sigma=.5):
-    return torch.exp(-((x - mu) ** 2) / (2 * sigma ** 2)) / torch.sqrt(2 * torch.tensor(math.pi)) / sigma
-
-
-class ActFun_adp(torch.autograd.Function):
-    @staticmethod
-    def forward(input):
-        return input.gt(0).float()  # is firing ???
-
-act_fun_adp = ActFun_adp.apply
-
 class LSNN(nn.Module):
     def __init__(self, i_size, h_size, o_size, b_size):
         super(LSNN, self).__init__()
@@ -160,7 +144,7 @@ class LSNN(nn.Module):
         u_t = u_t + du
 
         spk = u_t - thr
-        spk = act_fun_adp(spk)
+        spk = spk.gt(0).float()
         u_t = u_t * (1 - spk) + (self.u_r * spk)
 
         return u_t, spk, b_t
