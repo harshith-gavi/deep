@@ -187,7 +187,7 @@ model_spk = []
 print('TRAINING THE MODEL...')
 for _ in range(1, 2):
     progress_bar = tqdm(total = len(shd_train), desc = 'Epoch {}'.format(_))
-    for n, (X, y) in enumerate(shd_train):
+    for (X, y) in enumerate(shd_train):
         inputs = X
         labels = y
         b_size, seq_num, i_size = inputs.shape
