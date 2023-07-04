@@ -183,7 +183,6 @@ print('Available CUDA memory: ', torch.cuda.mem_get_info())
 
 model_u = []
 model_spk = []
-shd_train = shd_train[:int(0.8 * len(shd_train))]
 
 print('TRAINING THE MODEL...')
 for _ in range(1, 2):
