@@ -231,7 +231,7 @@ model_spk = []
 shd_train = shd_train[:int(0.8 * len(shd_train))]
 
 print('TRAINING THE MODEL...')
-for _ in range(1, 5):
+for _ in range(1, 2):
     progress_bar = tqdm(total = len(shd_train), desc = 'Epoch {}'.format(_))
     for batch in shd_train:
         inputs, labels = batch
@@ -244,7 +244,8 @@ for _ in range(1, 5):
             del xx
         progress_bar.update(1)
     progress_bar.close()
-    
+
+torch.cuda.empty_cache()
 print('Available CUDA memory: ', torch.cuda.mem_get_info())
 
 
