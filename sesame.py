@@ -159,7 +159,8 @@ class LSNN(nn.Module):
         du = (-u_t + op) / alpha
         u_t = u_t + du
 
-        spk = act_fun_adp(u_t - thr)
+        spk = u_t - thr
+        spk = act_fun_adp(spk)
         u_t = u_t * (1 - spk) + (self.u_r * spk)
 
         return u_t, spk, b_t
