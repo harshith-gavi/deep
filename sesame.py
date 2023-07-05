@@ -72,6 +72,11 @@ shd_test = h5py.File(datapath + 'test_data/SHD/shd_test.h5', 'r')
 shd_train = data_mod(shd_train['spikes'], shd_train['labels'], batch_size = args.batch_size, step_size = 100, input_size = tonic.datasets.SHD.sensor_size[0], max_time = 1.4)
 shd_test = data_mod(shd_test['spikes'], shd_test['labels'], batch_size = 1, step_size = 100, input_size = tonic.datasets.SHD.sensor_size[0], max_time = 1.4)
 
+b1 = torch.zeros(b_size, h_size[0]).to(device_1)
+b2 = torch.zeros(b_size, h_size[1]).to(device_2)
+b3 = torch.zeros(b_size, o_size).to(device_2)
+
+
 class LSNN(nn.Module):
     def __init__(self, i_size, h_size, o_size):
         super(LSNN, self).__init__()
@@ -85,9 +90,9 @@ class LSNN(nn.Module):
         self.u2 = torch.zeros(b_size, h_size[1]).to(device_2)
         self.u3 = torch.zeros(b_size, o_size).to(device_2)
 
-        self.b1 = torch.zeros(b_size, h_size[0]).to(device_1)
-        self.b2 = torch.zeros(b_size, h_size[1]).to(device_2)
-        self.b3 = torch.zeros(b_size, o_size).to(device_2)
+        # self.b1 = torch.zeros(b_size, h_size[0]).to(device_1)
+        # self.b2 = torch.zeros(b_size, h_size[1]).to(device_2)
+        # self.b3 = torch.zeros(b_size, o_size).to(device_2)
 
         self.spk1 = torch.zeros(b_size, h_size[0]).to(device_1)       # Spikes
         self.spk2 = torch.zeros(b_size, h_size[1]).to(device_2)
@@ -159,22 +164,19 @@ class LSNN(nn.Module):
         x_t = x_t.to(device_1)
         L1 = self.syn1(x_t)
         T_m = self.act(self.l1_T_m(L1 + self.u1))
-        T_adp = self.act(self.l1_T_adp(L1 + self.b1))
-        b = self.b1
-        self.u1, self.spk1, self.b1 = self.update_params(L1, self.u1, self.spk1, T_m, T_adp, b)
+        T_adp = self.act(self.l1_T_adp(L1 + b1))
+        self.u1, self.spk1, self.b1 = self.update_params(L1, self.u1, self.spk1, T_m, T_adp, b1)
         temp = self.spk1
         temp = temp.to(device_2)
         L2 = self.syn2(temp)
         T_m = self.act(self.l2_T_m(L2 + self.u2))
-        T_adp = self.act(self.l2_T_adp(L2 + self.b2))
-        b = self.b2
-        self.u2, self.spk2, self.b2  = self.update_params(L2, self.u2, self.spk2, T_m, T_adp, b)
+        T_adp = self.act(self.l2_T_adp(L2 + b2))
+        self.u2, self.spk2, self.b2  = self.update_params(L2, self.u2, self.spk2, T_m, T_adp, b2)
 
         L3 = self.syn3(self.spk2)
         T_m = self.act(self.o_T_m(L3 + self.u3))
-        T_adp = self.act(self.o_T_adp(L3 + self.b3))
-        b = self.b3
-        self.u3, self.spk_out, self.b3 =  self.update_params(L3, self.u3, self.spk_out, T_m, T_adp, b)
+        T_adp = self.act(self.o_T_adp(L3 + b3))
+        self.u3, self.spk_out, self.b3 =  self.update_params(L3, self.u3, self.spk_out, T_m, T_adp, b3)
         
         del x_t, T_m, T_adp, L1, L2, L3, temp
 
