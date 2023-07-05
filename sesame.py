@@ -72,12 +72,6 @@ shd_test = h5py.File(datapath + 'test_data/SHD/shd_test.h5', 'r')
 shd_train = data_mod(shd_train['spikes'], shd_train['labels'], batch_size = args.batch_size, step_size = 100, input_size = tonic.datasets.SHD.sensor_size[0], max_time = 1.4)
 shd_test = data_mod(shd_test['spikes'], shd_test['labels'], batch_size = 1, step_size = 100, input_size = tonic.datasets.SHD.sensor_size[0], max_time = 1.4)
 
-
-b_size = args.batch_size
-b1 = torch.zeros(b_size, 128).to(device_1)
-b2 = torch.zeros(b_size, 64).to(device_2)
-b3 = torch.zeros(b_size, 20).to(device_2)
-
 class LSNN(nn.Module):
     def __init__(self, i_size, h_size, o_size):
         super(LSNN, self).__init__()
@@ -89,10 +83,6 @@ class LSNN(nn.Module):
         self.u1 = torch.zeros(b_size, h_size[0]).to(device_1)         # Membrane Potentials
         self.u2 = torch.zeros(b_size, h_size[1]).to(device_2)
         self.u3 = torch.zeros(b_size, o_size).to(device_2)
-
-        # self.b1 = torch.zeros(b_size, h_size[0]).to(device_1)
-        # self.b2 = torch.zeros(b_size, h_size[1]).to(device_2)
-        # self.b3 = torch.zeros(b_size, o_size).to(device_2)
 
         self.spk1 = torch.zeros(b_size, h_size[0]).to(device_1)       # Spikes
         self.spk2 = torch.zeros(b_size, h_size[1]).to(device_2)
@@ -165,48 +155,63 @@ class LSNN(nn.Module):
         L1 = self.syn1(x_t)
         T_m = self.act(self.l1_T_m(L1 + self.u1))
         T_adp = self.act(self.l1_T_adp(L1 + b1))
-        self.u1, self.spk1, self.b1 = self.update_params(L1, self.u1, self.spk1, T_m, T_adp, b1)
+        self.u1, self.spk1, b1 = self.update_params(L1, self.u1, self.spk1, T_m, T_adp, b1)
         temp = self.spk1
         temp = temp.to(device_2)
         L2 = self.syn2(temp)
         T_m = self.act(self.l2_T_m(L2 + self.u2))
         T_adp = self.act(self.l2_T_adp(L2 + b2))
-        self.u2, self.spk2, self.b2  = self.update_params(L2, self.u2, self.spk2, T_m, T_adp, b2)
+        self.u2, self.spk2, b2  = self.update_params(L2, self.u2, self.spk2, T_m, T_adp, b2)
 
         L3 = self.syn3(self.spk2)
         T_m = self.act(self.o_T_m(L3 + self.u3))
         T_adp = self.act(self.o_T_adp(L3 + b3))
-        self.u3, self.spk_out, self.b3 =  self.update_params(L3, self.u3, self.spk_out, T_m, T_adp, b3)
+        self.u3, self.spk_out, b3 =  self.update_params(L3, self.u3, self.spk_out, T_m, T_adp, b3)
         
         del x_t, T_m, T_adp, L1, L2, L3, temp
 
-print('Available CUDA memory: ', torch.cuda.mem_get_info()[0] / (1024 * 1024))
-print('Creating model...')
-model = LSNN(700, [128, 64], 20)
-print('Available CUDA memory: ', torch.cuda.mem_get_info()[0] / (1024 * 1024))
 
-model_u = []
-model_spk = []
-shd_train = shd_train[:int(0.8 * len(shd_train))]
-
-print('TRAINING THE MODEL...')
-for _ in range(1, 5):
-    progress_bar = tqdm(total = len(shd_train), desc = 'Epoch {}'.format(_))
-    for batch in shd_train:
-        inputs, labels = batch
-        b_size, seq_num, i_size = inputs.shape
-
-        for i in range(seq_num):
-            xx = inputs.to_dense()[:, i, :]
-            model.FPTT(xx)
-            model_spk.append(model.spk_out)
-            del xx
-
-        progress_bar.update(1)
-    progress_bar.close()
+def create_model():
+    print('Available CUDA memory: ', torch.cuda.mem_get_info()[0] / (1024 * 1024))
+    print('CREATING A MODEL...')
     
-torch.cuda.empty_cache()
-print('Available CUDA memory: ', torch.cuda.mem_get_info()[0] / (1024 * 1024))
+    model_spk = []
+    shd_train = shd_train[:int(0.8 * len(shd_train))]
+    
+    b_size = args.batch_size
+    i_size = 700
+    h_size = [128, 64]
+    o_size = 20
 
-for j in range(20):
-    print(model_spk[0][j])
+    # # Membrane Potentials
+    # self.u1 = torch.zeros(b_size, h_size[0]).to(device_1)
+    # self.u2 = torch.zeros(b_size, h_size[1]).to(device_2)
+    # self.u3 = torch.zeros(b_size, o_size).to(device_2)
+    
+    b1 = torch.zeros(b_size, h_size[0]).to(device_1)
+    b2 = torch.zeros(b_size, h_size[1]).to(device_2)
+    b3 = torch.zeros(b_size, o_size).to(device_2)
+
+    model = LSNN(i_size, h_size, o_size)
+    print('Available CUDA memory: ', torch.cuda.mem_get_info()[0] / (1024 * 1024))
+    print('TRAINING THE MODEL...')
+    for _ in range(1, 5):
+        progress_bar = tqdm(total = len(shd_train), desc = 'Epoch {}'.format(_))
+        for batch in shd_train:
+            inputs, labels = batch
+            b_size, seq_num, i_size = inputs.shape
+    
+            for i in range(seq_num):
+                xx = inputs.to_dense()[:, i, :]
+                model.FPTT(xx)
+                model_spk.append(model.spk_out)
+                del xx
+    
+            progress_bar.update(1)
+        progress_bar.close()
+        
+    torch.cuda.empty_cache()
+    print('Available CUDA memory: ', torch.cuda.mem_get_info()[0] / (1024 * 1024))
+
+    for j in range(20):
+        print(model_spk[0][j])
