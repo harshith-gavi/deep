@@ -129,7 +129,7 @@ class LSNN(nn.Module):
         nn.init.zeros_(self.o_T_adp.bias)
         nn.init.zeros_(self.o_T_m.bias)
 
-    def update_params(self, op, u_t, spk, t_m, t_adp, b_t):
+    def update_params(op, u_t, spk, t_m, t_adp, b_t):
         """
         Used to update the parameters
         INPUT: Layer output, Membrane Potential, Spikes, T_adp, T_m and Intermediate State Variable (b_t)
