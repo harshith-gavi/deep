@@ -72,16 +72,16 @@ shd_test = h5py.File(datapath + 'test_data/SHD/shd_test.h5', 'r')
 shd_train = data_mod(shd_train['spikes'], shd_train['labels'], batch_size = args.batch_size, step_size = 100, input_size = tonic.datasets.SHD.sensor_size[0], max_time = 1.4)
 shd_test = data_mod(shd_test['spikes'], shd_test['labels'], batch_size = 1, step_size = 100, input_size = tonic.datasets.SHD.sensor_size[0], max_time = 1.4)
 
+
+b_size = args.batch_size
 b1 = torch.zeros(b_size, h_size[0]).to(device_1)
 b2 = torch.zeros(b_size, h_size[1]).to(device_2)
 b3 = torch.zeros(b_size, o_size).to(device_2)
-
 
 class LSNN(nn.Module):
     def __init__(self, i_size, h_size, o_size):
         super(LSNN, self).__init__()
 
-        b_size = args.batch_size
         self.u_r = 0                                                # Resting Potential
         self.thr = 0.5                                              # Threshold
         self.thr_min = 0.01                                         # Threshold Baseline
