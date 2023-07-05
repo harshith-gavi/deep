@@ -148,7 +148,7 @@ class LSNN(nn.Module):
         T_adp = self.act(self.l2_T_adp(L2 + b_t[1]))
         u_t[1], spk_t[1], b_t[1]  = self.update_params(L2, u_t[1], spk_t[1], T_m, T_adp, b_t[1])
 
-        L3 = self.syn3(self.spk2)
+        L3 = self.syn3(spk_t[1])
         T_m = self.act(self.o_T_m(L3 + u_t[2]))
         T_adp = self.act(self.o_T_adp(L3 + b_t[2]))
         u_t[2], spk_t[2], b_t[2] =  self.update_params(L3, u_t[2], spk_t[2], T_m, T_adp, b_t[2])
