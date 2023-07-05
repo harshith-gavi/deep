@@ -200,12 +200,11 @@ for _ in range(1, 2):
         progress_bar.update(1)
     progress_bar.close()
     
-    # allez_var = list(locals().keys())
-    # print(allez_var)
-    # for var_name in allez_var:
-    #     if var_name != '_':
-    #         del locals()[var_name]
-    #Editing here
+    allez_var = list(locals().keys())
+    print(allez_var)
+    for var_name in allez_var:
+        if var_name != '_':
+            del locals()[var_name]
     
 torch.cuda.empty_cache()
 print('Available CUDA memory: ', torch.cuda.mem_get_info()[0] / (1024 * 1024))
