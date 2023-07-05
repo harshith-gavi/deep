@@ -206,7 +206,7 @@ def es_geht():
             for i in range(seq_num):
                 xx = inputs.to_dense()[:, i, :]
                 u, b, spk = model.FPTT(xx, u, b, spk)
-                model_spk.append(model.spk_out)
+                model_spk.append(spk[2])
                 del xx
     
             progress_bar.update(1)
