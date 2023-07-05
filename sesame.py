@@ -48,7 +48,7 @@ def data_mod(X, y, batch_size, step_size, input_size, max_time, shuffle=True):
             coo[1].extend(times)
             coo[2].extend(units)
 
-        i = torch.IntTensor(coo).to(device_0)
+        i = torch.LongTensor(coo).to(device_0)
         v = torch.FloatTensor(np.ones(len(coo[0]))).to(device_0)
 
         X_batch = torch.sparse.FloatTensor(i, v, torch.Size([batch_size,step_size,input_size])).to(device_0)
