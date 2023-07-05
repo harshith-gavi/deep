@@ -177,7 +177,7 @@ class LSNN(nn.Module):
 
 print('Available CUDA memory: ', torch.cuda.mem_get_info()[0] / (1024 * 1024))
 print('Creating model...')
-model = LSNN(700, [256, 64], 20)
+model = LSNN(700, [128, 64], 20)
 print('Available CUDA memory: ', torch.cuda.mem_get_info()[0] / (1024 * 1024))
 
 model_u = []
@@ -199,12 +199,6 @@ for _ in range(1, 2):
 
         progress_bar.update(1)
     progress_bar.close()
-    
-    allez_var = list(locals().keys())
-    print(allez_var)
-    for var_name in allez_var[-8:0]:
-        if var_name != '_':
-            del locals()[var_name]
     
 torch.cuda.empty_cache()
 print('Available CUDA memory: ', torch.cuda.mem_get_info()[0] / (1024 * 1024))
