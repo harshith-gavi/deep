@@ -69,9 +69,9 @@ class LSNN(nn.Module):
         self.thr = 0.5                                              # Threshold
         self.thr_min = 0.01                                         # Threshold Baseline
 
-        self.spk1 = torch.zeros(b_size, h_size[0]).to(device_1)       # Spikes
-        self.spk2 = torch.zeros(b_size, h_size[1]).to(device_2)
-        self.spk_out = torch.zeros(b_size, o_size).to(device_2)
+        # self.spk1 = torch.zeros(b_size, h_size[0]).to(device_1)       # Spikes
+        # self.spk2 = torch.zeros(b_size, h_size[1]).to(device_2)
+        # self.spk_out = torch.zeros(b_size, o_size).to(device_2)
 
         self.syn1 = nn.Linear(i_size, h_size[0]).to(device_1)                    # Synapses/Connections
         self.syn2 = nn.Linear(h_size[0], h_size[1]).to(device_2)
@@ -109,7 +109,7 @@ class LSNN(nn.Module):
         nn.init.zeros_(self.o_T_adp.bias)
         nn.init.zeros_(self.o_T_m.bias)
 
-    def update_params(self, op, u_t_, spk, t_m, t_adp, b_t_):
+    def update_params(self, op, u_t_, spk_, t_m, t_adp, b_t_):
         """
         Used to update the parameters
         INPUT: Layer output, Membrane Potential, Spikes, T_adp, T_m and Intermediate State Variable (b_t)
@@ -118,19 +118,19 @@ class LSNN(nn.Module):
         alpha = t_m
         rho = t_adp
 
-        b_t = (rho * b_t_) + ((1 - rho) * spk)
+        b_t_ = (rho * b_t_) + ((1 - rho) * spk_)
         thr = self.thr_min + (1.8 * b_t_)
 
         du = (-u_t_ + op) / alpha
         u_t_ = u_t_ + du
 
-        spk = u_t_ - thr
-        spk = spk.gt(0).float()
-        u_t_ = u_t_ * (1 - spk) + (self.u_r * spk)
+        spk_ = u_t_ - thr
+        spk_ = spk_.gt(0).float()
+        u_t_ = u_t_ * (1 - spk_) + (self.u_r * spk_)
 
-        return u_t_, spk, b_t_
+        return u_t_, spk_, b_t_
 
-    def FPTT(self, x_t, u_t, b_t):
+    def FPTT(self, x_t, u_t, b_t, spk_t):
         """
         Used to train using Forward Pass Through Time Algorithm
         INPUT: Spikes
@@ -140,22 +140,22 @@ class LSNN(nn.Module):
         L1 = self.syn1(x_t)
         T_m = self.act(self.l1_T_m(L1 + u_t[0]))
         T_adp = self.act(self.l1_T_adp(L1 + b_t[0]))
-        u_t[0], self.spk1, b_t[0] = self.update_params(L1, u_t[0], self.spk1, T_m, T_adp, b_t[0])
-        temp = self.spk1
+        u_t[0], spk_t[0], b_t[0] = self.update_params(L1, u_t[0], spk_t[0], T_m, T_adp, b_t[0])
+        temp = spk_t[0]
         temp = temp.to(device_2)
         L2 = self.syn2(temp)
         T_m = self.act(self.l2_T_m(L2 + u_t[1]))
         T_adp = self.act(self.l2_T_adp(L2 + b_t[1]))
-        u_t[1], self.spk2, b_t[1]  = self.update_params(L2, u_t[1], self.spk2, T_m, T_adp, b_t[1])
+        u_t[1], spk_t[1], b_t[1]  = self.update_params(L2, u_t[1], spk_t[1], T_m, T_adp, b_t[1])
 
         L3 = self.syn3(self.spk2)
         T_m = self.act(self.o_T_m(L3 + u_t[2]))
         T_adp = self.act(self.o_T_adp(L3 + b_t[2]))
-        u_t[2], self.spk_out, b_t[2] =  self.update_params(L3, u_t[2], self.spk_out, T_m, T_adp, b_t[2])
+        u_t[2], spk_t[2], b_t[2] =  self.update_params(L3, u_t[2], spk_t[2], T_m, T_adp, b_t[2])
         
         del x_t, T_m, T_adp, L1, L2, L3, temp
 
-        return u_t, b_t
+        return u_t, b_t, spk_t
 
 
 def es_geht():
@@ -188,8 +188,12 @@ def es_geht():
          torch.zeros(b_size, o_size).to(device_2)]
     
     b = [torch.zeros(b_size, h_size[0]).to(device_1),
-          torch.zeros(b_size, h_size[1]).to(device_2),
-          torch.zeros(b_size, o_size).to(device_2)]
+         torch.zeros(b_size, h_size[1]).to(device_2),
+         torch.zeros(b_size, o_size).to(device_2)]
+
+    spk = [torch.zeros(b_size, h_size[0]).to(device_1),
+           torch.zeros(b_size, h_size[1]).to(device_2),
+           torch.zeros(b_size, o_size).to(device_2)]
 
     model = LSNN(i_size, h_size, o_size)
     print('Available CUDA memory: ', torch.cuda.mem_get_info()[0] / (1024 * 1024))
@@ -202,7 +206,7 @@ def es_geht():
     
             for i in range(seq_num):
                 xx = inputs.to_dense()[:, i, :]
-                u, b = model.FPTT(xx, u, b)
+                u, b, spk = model.FPTT(xx, u, b, spk)
                 model_spk.append(model.spk_out)
                 del xx
     
