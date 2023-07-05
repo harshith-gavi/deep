@@ -128,6 +128,7 @@ class LSNN(nn.Module):
         spk = spk.gt(0).float()
         u = u * (1 - spk) + (self.u_r * spk)
 
+        del alpha, rho, thr, du
         return u, spk, b
 
     def FPTT(self, x_t, u_t, b_t, spk_t):
@@ -209,7 +210,7 @@ def es_geht():
                 u, b, spk = model.FPTT(xx, u, b, spk)
                 model_spk.append(spk[2])
                 del xx
-    
+                print('Available CUDA memory: ', torch.cuda.mem_get_info()[0] / (1024 * 1024))
             progress_bar.update(1)
         progress_bar.close()
         
