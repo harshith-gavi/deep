@@ -113,7 +113,7 @@ class LSNN(nn.Module):
         nn.init.zeros_(self.o_T_adp.bias)
         nn.init.zeros_(self.o_T_m.bias)
 
-    def update_params(self, op, u_t, spk, t_m, t_adp, b_t_):
+    def update_params(self, op, u_t_, spk, t_m, t_adp, b_t_):
         """
         Used to update the parameters
         INPUT: Layer output, Membrane Potential, Spikes, T_adp, T_m and Intermediate State Variable (b_t)
@@ -125,16 +125,16 @@ class LSNN(nn.Module):
         b_t = (rho * b_t_) + ((1 - rho) * spk)
         thr = self.thr_min + (1.8 * b_t_)
 
-        du = (-u_t + op) / alpha
-        u_t = u_t + du
+        du = (-u_t_ + op) / alpha
+        u_t_ = u_t_ + du
 
-        spk = u_t - thr
+        spk = u_t_ - thr
         spk = spk.gt(0).float()
-        u_t = u_t * (1 - spk) + (self.u_r * spk)
+        u_t_ = u_t_ * (1 - spk) + (self.u_r * spk)
 
-        return u_t, spk, b_t_
+        return u_t_, spk, b_t_
 
-    def FPTT(self, x_t, b_t):
+    def FPTT(self, x_t, u_t, b_t):
         """
         Used to train using Forward Pass Through Time Algorithm
         INPUT: Spikes
@@ -142,24 +142,24 @@ class LSNN(nn.Module):
         """
         x_t = x_t.to(device_1)
         L1 = self.syn1(x_t)
-        T_m = self.act(self.l1_T_m(L1 + self.u1))
+        T_m = self.act(self.l1_T_m(L1 + u_t[0]))
         T_adp = self.act(self.l1_T_adp(L1 + b_t[0]))
-        self.u1, self.spk1, b_t[0] = self.update_params(L1, self.u1, self.spk1, T_m, T_adp, b_t[0])
+        u_t[0], self.spk1, b_t[0] = self.update_params(L1, u_t[0], self.spk1, T_m, T_adp, b_t[0])
         temp = self.spk1
         temp = temp.to(device_2)
         L2 = self.syn2(temp)
-        T_m = self.act(self.l2_T_m(L2 + self.u2))
+        T_m = self.act(self.l2_T_m(L2 + u_t[1]))
         T_adp = self.act(self.l2_T_adp(L2 + b_t[1]))
-        self.u2, self.spk2, b_t[1]  = self.update_params(L2, self.u2, self.spk2, T_m, T_adp, b_t[1])
+        u_t[1], self.spk2, b_t[1]  = self.update_params(L2, u_t[1], self.spk2, T_m, T_adp, b_t[1])
 
         L3 = self.syn3(self.spk2)
-        T_m = self.act(self.o_T_m(L3 + self.u3))
+        T_m = self.act(self.o_T_m(L3 + u_t[2]))
         T_adp = self.act(self.o_T_adp(L3 + b_t[2]))
-        self.u3, self.spk_out, b_t[2] =  self.update_params(L3, self.u3, self.spk_out, T_m, T_adp, b_t[2])
+        u_t[2], self.spk_out, b_t[2] =  self.update_params(L3, u_t[2], self.spk_out, T_m, T_adp, b_t[2])
         
         del x_t, T_m, T_adp, L1, L2, L3, temp
 
-        return b_t
+        return u_t, b_t
 
 
 def es_geht():
@@ -167,29 +167,29 @@ def es_geht():
     parser = argparse.ArgumentParser()
     parser.add_argument('--batch_size', type=int, default=32)
     args = parser.parse_args()
+    b_size = args.batch_size
     
     print('PREPROCESSING DATA...')
     shd_train = h5py.File(datapath + 'train_data/SHD/shd_train.h5', 'r')
     shd_test = h5py.File(datapath + 'test_data/SHD/shd_test.h5', 'r')
     
-    shd_train = data_mod(shd_train['spikes'], shd_train['labels'], batch_size = args.batch_size, step_size = 100, input_size = tonic.datasets.SHD.sensor_size[0], max_time = 1.4)
+    shd_train = data_mod(shd_train['spikes'], shd_train['labels'], batch_size = b_size, step_size = 100, input_size = tonic.datasets.SHD.sensor_size[0], max_time = 1.4)
     shd_test = data_mod(shd_test['spikes'], shd_test['labels'], batch_size = 1, step_size = 100, input_size = tonic.datasets.SHD.sensor_size[0], max_time = 1.4)
 
     shd_train = shd_train[:int(0.8 * len(shd_train))]
     
     print('Available CUDA memory: ', torch.cuda.mem_get_info()[0] / (1024 * 1024))
     print('CREATING A MODEL...')    
-    b_size = args.batch_size
     i_size = 700
     h_size = [128, 64]
     o_size = 20
     
     model_spk = []                                                    # Output Spikes
 
-    # # Membrane Potentials
-    # self.u1 = torch.zeros(b_size, h_size[0]).to(device_1)
-    # self.u2 = torch.zeros(b_size, h_size[1]).to(device_2)
-    # self.u3 = torch.zeros(b_size, o_size).to(device_2)
+    # Membrane Potentials
+    u = [torch.zeros(b_size, h_size[0]).to(device_1),
+         torch.zeros(b_size, h_size[1]).to(device_2),
+         torch.zeros(b_size, o_size).to(device_2)]
     
     b = [torch.zeros(b_size, h_size[0]).to(device_1),
           torch.zeros(b_size, h_size[1]).to(device_2),
@@ -206,7 +206,7 @@ def es_geht():
     
             for i in range(seq_num):
                 xx = inputs.to_dense()[:, i, :]
-                b = model.FPTT(xx, b)
+                u, b = model.FPTT(xx, u, b)
                 model_spk.append(model.spk_out)
                 del xx
     
