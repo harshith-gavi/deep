@@ -161,7 +161,8 @@ class LSNN(nn.Module):
 def es_geht():
     print('PARSING ARGUMENTS...')
     parser = argparse.ArgumentParser()
-    parser.add_argument('--batch_size', type=int, default=32)
+    parser.add_argument('--batch_size', type = int, default = 128)
+    parser.add_argument('--epochs', type = int, default = 10)
     args = parser.parse_args()
     
     print('PREPROCESSING DATA...')
@@ -181,15 +182,12 @@ def es_geht():
     o_size = 20
     
     model_spk = []                                                              # Output Spikes
-
     u = [torch.zeros(b_size, h_size[0]).to(device_1),                           # Membrane Potentials
          torch.zeros(b_size, h_size[1]).to(device_2),
          torch.zeros(b_size, o_size).to(device_2)]
-    
     b = [torch.zeros(b_size, h_size[0]).to(device_1),
-          torch.zeros(b_size, h_size[1]).to(device_2),
-          torch.zeros(b_size, o_size).to(device_2)]
-
+         torch.zeros(b_size, h_size[1]).to(device_2),
+         torch.zeros(b_size, o_size).to(device_2)]
     spk = [torch.zeros(b_size, h_size[0]).to(device_1),                         # Spikes
            torch.zeros(b_size, h_size[1]).to(device_2),
            torch.zeros(b_size, o_size).to(device_2)]
@@ -197,7 +195,9 @@ def es_geht():
     model = LSNN(i_size, h_size, o_size)
     print('Available CUDA memory: ', torch.cuda.mem_get_info()[0] / (1024 * 1024))
     print('TRAINING THE MODEL...')
-    for _ in range(1, 10):
+    epochs = args.epochs + 1
+    
+    for _ in range(1, epochs):
         progress_bar = tqdm(total = len(shd_train), desc = 'Epoch {}'.format(_))
         for batch in shd_train:
             inputs, labels = batch
@@ -212,8 +212,8 @@ def es_geht():
             progress_bar.update(1)
         progress_bar.close()
         
-    torch.cuda.empty_cache()
-    print('Available CUDA memory: ', torch.cuda.mem_get_info()[0] / (1024 * 1024))
+        torch.cuda.empty_cache()
+        print('Available CUDA memory: ', torch.cuda.mem_get_info()[0] / (1024 * 1024))
 
     for j in range(20):
         print(model_spk[0][j])
