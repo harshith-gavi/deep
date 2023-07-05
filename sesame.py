@@ -164,19 +164,21 @@ def es_geht():
     parser.add_argument('--batch_size', type = int, default = 128)
     parser.add_argument('--epochs', type = int, default = 10)
     args = parser.parse_args()
+    b_size = args.batch_size
+    epochs = args.epochs
     
     print('PREPROCESSING DATA...')
     shd_train = h5py.File(datapath + 'train_data/SHD/shd_train.h5', 'r')
     shd_test = h5py.File(datapath + 'test_data/SHD/shd_test.h5', 'r')
     
-    shd_train = data_mod(shd_train['spikes'], shd_train['labels'], batch_size = args.batch_size, step_size = 100, input_size = tonic.datasets.SHD.sensor_size[0], max_time = 1.4)
+    shd_train = data_mod(shd_train['spikes'], shd_train['labels'], batch_size = b_size, step_size = 100, input_size = tonic.datasets.SHD.sensor_size[0], max_time = 1.4)
     shd_test = data_mod(shd_test['spikes'], shd_test['labels'], batch_size = 1, step_size = 100, input_size = tonic.datasets.SHD.sensor_size[0], max_time = 1.4)
 
     shd_train = shd_train[:int(0.8 * len(shd_train))]
     
     print('Available CUDA memory: ', torch.cuda.mem_get_info()[0] / (1024 * 1024))
     print('CREATING A MODEL...')    
-    b_size = args.batch_size
+   
     i_size = 700
     h_size = [128, 64]
     o_size = 20
@@ -195,9 +197,8 @@ def es_geht():
     model = LSNN(i_size, h_size, o_size)
     print('Available CUDA memory: ', torch.cuda.mem_get_info()[0] / (1024 * 1024))
     print('TRAINING THE MODEL...')
-    epochs = args.epochs + 1
     
-    for _ in range(1, epochs):
+    for _ in range(1, epochs+1):
         progress_bar = tqdm(total = len(shd_train), desc = 'Epoch {}'.format(_))
         for batch in shd_train:
             inputs, labels = batch
