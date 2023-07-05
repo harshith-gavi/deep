@@ -74,9 +74,9 @@ shd_test = data_mod(shd_test['spikes'], shd_test['labels'], batch_size = 1, step
 
 
 b_size = args.batch_size
-b1 = torch.zeros(b_size, h_size[0]).to(device_1)
-b2 = torch.zeros(b_size, h_size[1]).to(device_2)
-b3 = torch.zeros(b_size, o_size).to(device_2)
+b1 = torch.zeros(b_size, 128).to(device_1)
+b2 = torch.zeros(b_size, 64).to(device_2)
+b3 = torch.zeros(b_size, 20).to(device_2)
 
 class LSNN(nn.Module):
     def __init__(self, i_size, h_size, o_size):
