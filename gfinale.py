@@ -62,11 +62,11 @@ def data_mod(X, y, batch_size, step_size, input_size, max_time, shuffle=True):
 
 class LSNN_layer(nn.Module):
     """
-    LSNN class module
-    INPUT: Input Layer Size, Hidden Layers Size, Output Layer Size
+    LSNN layer module
+    INPUT: Input Size, Output Size
     """
     def __init__(self, i_size, o_size):
-        super(LSNN, self).__init__()
+        super(LSNN_layer, self).__init__()
 
         self.u_r = 0                                                        # Resting Potential
         self.thr = 0.5                                                      # Threshold
@@ -89,9 +89,9 @@ class LSNN_layer(nn.Module):
         nn.init.zeros_(self.l1_T_adp.bias)
         nn.init.zeros_(self.l1_T_m.bias)
 
-    def FPTT(self, x_t):
+    def forward(self, x_t):
         """
-        Used to train using Forward Pass Through Time Algorithm and update the layer parameters
+        Used to train the layer using Forward Pass Through Time Algorithm and update its parameters
         INPUT: Input Spikes
         OUTPUT: Membrane Potential, Spikes and Intermediate State Variable (b_t)
         """
@@ -113,13 +113,24 @@ class LSNN_layer(nn.Module):
         self.spk = self.spk.gt(0).float()
         self.u_t = self.u_t * (1 - self.spk) + (self.u_r * self.spk)
 
-        l_u = self.u_t
-        l_spk = self.spk_t
-        l_b = self.b_t
+        o_spk = self.spk_t
         
         del x_t, L1, T_m, T_adp, alpha, rho, du
-        return (l_u, l_spk, l_b)
+        return o_spk
 
+def LSNN_network(nn.Module):
+    def __init__(self):
+        super(LSNN_model, self).__init__()
+
+        i_size = 700
+        h_size = [128, 64]
+        o_size = 20
+
+        layers = [LSNN_layer(i_size, h_size[0]), LSNN_layer(h_size[0], h_size[1]), LSNN_layer(h_size[1], o_size)]
+        self.network = nn.Sequential(*layers)
+
+    def forward(self, x_t):
+        return self.network(x_t)
 
 def es_geht():
     print('PARSING ARGUMENTS...')
@@ -141,32 +152,30 @@ def es_geht():
     
     print('Available CUDA memory: ', torch.cuda.mem_get_info()[0] / (1024 * 1024))
     print('CREATING A MODEL...')    
-   
-    i_size = 700
-    h_size = [128, 64]
-    o_size = 20
-    
-    model_spk = []                                                              # Output Spikes
+    model = LSNN_network()
 
-    model = LSNN(i_size, h_size, o_size)
     print('Available CUDA memory: ', torch.cuda.mem_get_info()[0] / (1024 * 1024))
     print('TRAINING THE MODEL...')
     
     for _ in range(1, epochs+1):
         progress_bar = tqdm(total = len(shd_train), desc = 'Epoch {}'.format(_))
+        model_spk = []
+        
         for batch in shd_train:
             inputs, labels = batch
             b_size, seq_num, i_size = inputs.shape
     
             for i in range(seq_num):
                 xx = inputs.to_dense()[:, i, :]
-                u, b, spk = model.FPTT(xx, u, b, spk)
-                del xx
-                
-            model_spk.append(spk[2])
-            progress_bar.update(1)
-            
+                o_spk = model(xx)
+                model_spk.append(o_spk)
+                del xx, o_spk
+                       
+            progress_bar.update(1)   
         progress_bar.close()
+        
+        # Calculate and print('Accuracy: ', 1)
+        model_spk = []
         
         torch.cuda.empty_cache()
         print('Available CUDA memory: ', torch.cuda.mem_get_info()[0] / (1024 * 1024))
