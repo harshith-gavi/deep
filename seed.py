@@ -64,14 +64,9 @@ class LSNN(nn.Module):
     def __init__(self, i_size, h_size, o_size):
         super(LSNN, self).__init__()
 
-        b_size = 128
         self.u_r = 0                                                # Resting Potential
         self.thr = 0.5                                              # Threshold
         self.thr_min = 0.01                                         # Threshold Baseline
-
-        # self.spk1 = torch.zeros(b_size, h_size[0]).to(device_1)       # Spikes
-        # self.spk2 = torch.zeros(b_size, h_size[1]).to(device_2)
-        # self.spk_out = torch.zeros(b_size, o_size).to(device_2)
 
         self.syn1 = nn.Linear(i_size, h_size[0]).to(device_1)                    # Synapses/Connections
         self.syn2 = nn.Linear(h_size[0], h_size[1]).to(device_2)
@@ -128,6 +123,7 @@ class LSNN(nn.Module):
         spk_ = spk_.gt(0).float()
         u_t_ = u_t_ * (1 - spk_) + (self.u_r * spk_)
 
+        del du, thr
         return u_t_, spk_, b_t_
 
     def FPTT(self, x_t, u_t, b_t, spk_t):
