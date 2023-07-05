@@ -113,7 +113,7 @@ class LSNN(nn.Module):
         nn.init.zeros_(self.o_T_adp.bias)
         nn.init.zeros_(self.o_T_m.bias)
 
-    def update_params(self, op, u_t, spk, t_m, t_adp, b_t):
+    def update_params(self, op, u_t, spk, t_m, t_adp, b_t_):
         """
         Used to update the parameters
         INPUT: Layer output, Membrane Potential, Spikes, T_adp, T_m and Intermediate State Variable (b_t)
@@ -122,8 +122,8 @@ class LSNN(nn.Module):
         alpha = t_m
         rho = t_adp
 
-        b_t = (rho * b_t) + ((1 - rho) * spk)
-        thr = self.thr_min + (1.8 * b_t)
+        b_t = (rho * b_t_) + ((1 - rho) * spk)
+        thr = self.thr_min + (1.8 * b_t_)
 
         du = (-u_t + op) / alpha
         u_t = u_t + du
@@ -132,9 +132,9 @@ class LSNN(nn.Module):
         spk = spk.gt(0).float()
         u_t = u_t * (1 - spk) + (self.u_r * spk)
 
-        return u_t, spk, b_t
+        return u_t, spk, b_t_
 
-    def FPTT(self, x_t):
+    def FPTT(self, x_t, b_t):
         """
         Used to train using Forward Pass Through Time Algorithm
         INPUT: Spikes
@@ -143,21 +143,23 @@ class LSNN(nn.Module):
         x_t = x_t.to(device_1)
         L1 = self.syn1(x_t)
         T_m = self.act(self.l1_T_m(L1 + self.u1))
-        T_adp = self.act(self.l1_T_adp(L1 + b1))
-        self.u1, self.spk1, b1 = self.update_params(L1, self.u1, self.spk1, T_m, T_adp, b1)
+        T_adp = self.act(self.l1_T_adp(L1 + b_t[0]))
+        self.u1, self.spk1, b_t[0] = self.update_params(L1, self.u1, self.spk1, T_m, T_adp, b_t[0])
         temp = self.spk1
         temp = temp.to(device_2)
         L2 = self.syn2(temp)
         T_m = self.act(self.l2_T_m(L2 + self.u2))
-        T_adp = self.act(self.l2_T_adp(L2 + b2))
-        self.u2, self.spk2, b2  = self.update_params(L2, self.u2, self.spk2, T_m, T_adp, b2)
+        T_adp = self.act(self.l2_T_adp(L2 + b_t[1]))
+        self.u2, self.spk2, b_t[1]  = self.update_params(L2, self.u2, self.spk2, T_m, T_adp, b_t[1])
 
         L3 = self.syn3(self.spk2)
         T_m = self.act(self.o_T_m(L3 + self.u3))
-        T_adp = self.act(self.o_T_adp(L3 + b3))
-        self.u3, self.spk_out, b3 =  self.update_params(L3, self.u3, self.spk_out, T_m, T_adp, b3)
+        T_adp = self.act(self.o_T_adp(L3 + b_t[2]))
+        self.u3, self.spk_out, b_t[2] =  self.update_params(L3, self.u3, self.spk_out, T_m, T_adp, b_t[2])
         
         del x_t, T_m, T_adp, L1, L2, L3, temp
+
+        return b_t
 
 
 def es_geht():
@@ -189,9 +191,9 @@ def es_geht():
     # self.u2 = torch.zeros(b_size, h_size[1]).to(device_2)
     # self.u3 = torch.zeros(b_size, o_size).to(device_2)
     
-    b1 = torch.zeros(b_size, h_size[0]).to(device_1)
-    b2 = torch.zeros(b_size, h_size[1]).to(device_2)
-    b3 = torch.zeros(b_size, o_size).to(device_2)
+    b = [torch.zeros(b_size, h_size[0]).to(device_1),
+          torch.zeros(b_size, h_size[1]).to(device_2),
+          torch.zeros(b_size, o_size).to(device_2)]
 
     model = LSNN(i_size, h_size, o_size)
     print('Available CUDA memory: ', torch.cuda.mem_get_info()[0] / (1024 * 1024))
@@ -204,7 +206,7 @@ def es_geht():
     
             for i in range(seq_num):
                 xx = inputs.to_dense()[:, i, :]
-                model.FPTT(xx)
+                b = model.FPTT(xx, b)
                 model_spk.append(model.spk_out)
                 del xx
     
