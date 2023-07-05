@@ -215,3 +215,5 @@ def create_model():
 
     for j in range(20):
         print(model_spk[0][j])
+
+create_model()
