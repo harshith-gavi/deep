@@ -185,7 +185,7 @@ model_spk = []
 shd_train = shd_train[:int(0.8 * len(shd_train))]
 
 print('TRAINING THE MODEL...')
-for _ in range(1, 3):
+for _ in range(1, 5):
     progress_bar = tqdm(total = len(shd_train), desc = 'Epoch {}'.format(_))
     for batch in shd_train:
         inputs, labels = batch
