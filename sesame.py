@@ -60,18 +60,6 @@ def data_mod(X, y, batch_size, step_size, input_size, max_time, shuffle=True):
 
     return mod_data
 
-
-print('PREPROCESSING DATA...')
-parser = argparse.ArgumentParser()
-parser.add_argument('--batch_size', type=int, default=32)
-args = parser.parse_args()
-
-shd_train = h5py.File(datapath + 'train_data/SHD/shd_train.h5', 'r')
-shd_test = h5py.File(datapath + 'test_data/SHD/shd_test.h5', 'r')
-
-shd_train = data_mod(shd_train['spikes'], shd_train['labels'], batch_size = args.batch_size, step_size = 100, input_size = tonic.datasets.SHD.sensor_size[0], max_time = 1.4)
-shd_test = data_mod(shd_test['spikes'], shd_test['labels'], batch_size = 1, step_size = 100, input_size = tonic.datasets.SHD.sensor_size[0], max_time = 1.4)
-
 class LSNN(nn.Module):
     def __init__(self, i_size, h_size, o_size):
         super(LSNN, self).__init__()
@@ -171,17 +159,29 @@ class LSNN(nn.Module):
         del x_t, T_m, T_adp, L1, L2, L3, temp
 
 
-def create_model():
-    print('Available CUDA memory: ', torch.cuda.mem_get_info()[0] / (1024 * 1024))
-    print('CREATING A MODEL...')
+def es_geht():
+    print('PARSING ARGUMENTS...')
+    parser = argparse.ArgumentParser()
+    parser.add_argument('--batch_size', type=int, default=32)
+    args = parser.parse_args()
     
-    model_spk = []
+    print('PREPROCESSING DATA...')
+    shd_train = h5py.File(datapath + 'train_data/SHD/shd_train.h5', 'r')
+    shd_test = h5py.File(datapath + 'test_data/SHD/shd_test.h5', 'r')
+    
+    shd_train = data_mod(shd_train['spikes'], shd_train['labels'], batch_size = args.batch_size, step_size = 100, input_size = tonic.datasets.SHD.sensor_size[0], max_time = 1.4)
+    shd_test = data_mod(shd_test['spikes'], shd_test['labels'], batch_size = 1, step_size = 100, input_size = tonic.datasets.SHD.sensor_size[0], max_time = 1.4)
+
     shd_train = shd_train[:int(0.8 * len(shd_train))]
     
+    print('Available CUDA memory: ', torch.cuda.mem_get_info()[0] / (1024 * 1024))
+    print('CREATING A MODEL...')    
     b_size = args.batch_size
     i_size = 700
     h_size = [128, 64]
     o_size = 20
+    
+    model_spk = []                                                    # Output Spikes
 
     # # Membrane Potentials
     # self.u1 = torch.zeros(b_size, h_size[0]).to(device_1)
@@ -216,4 +216,4 @@ def create_model():
     for j in range(20):
         print(model_spk[0][j])
 
-create_model()
+es_geht()
