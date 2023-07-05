@@ -208,10 +208,11 @@ def es_geht():
             for i in range(seq_num):
                 xx = inputs.to_dense()[:, i, :]
                 u, b, spk = model.FPTT(xx, u, b, spk)
-                model_spk.append(spk[2])
                 del xx
-                print('Available CUDA memory: ', torch.cuda.mem_get_info()[0] / (1024 * 1024))
+                
+            model_spk.append(spk[2])
             progress_bar.update(1)
+            
         progress_bar.close()
         
         torch.cuda.empty_cache()
