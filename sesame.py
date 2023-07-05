@@ -64,7 +64,7 @@ class LSNN(nn.Module):
     def __init__(self, i_size, h_size, o_size):
         super(LSNN, self).__init__()
 
-        b_size = args.batch_size
+        b_size = 128
         self.u_r = 0                                                # Resting Potential
         self.thr = 0.5                                              # Threshold
         self.thr_min = 0.01                                         # Threshold Baseline
