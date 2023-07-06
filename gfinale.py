@@ -164,10 +164,11 @@ def es_geht():
         for batch in shd_train:
             inputs, labels = batch
             b_size, seq_num, i_size = inputs.shape
-            
+            b_spk = 1
             for i in range(seq_num):
                 xx = inputs.to_dense()[:, i, :]
-                b_spk = model(xx)              
+                b_spk = model(xx) 
+                print(type(b_spk))
                 del xx
                 
             model_spk.append(b_spk)      
