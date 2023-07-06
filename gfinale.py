@@ -114,7 +114,6 @@ class LSNN_layer(nn.Module):
         self.u_t = self.u_t * (1 - self.spk) + (self.u_r * self.spk)
         self.spk = self.spk
 
-        x_t, L1, alpha, rho, du = None, None, None, None, None
         del x_t, L1, alpha, rho, du
         torch.cuda.empty_cache()
 
@@ -166,7 +165,7 @@ def es_geht():
         for batch in shd_train:
             inputs, labels = batch
             b_size, seq_num, i_size = inputs.shape
-            b_spk = 0
+            b_spk = None
             
             for i in range(seq_num):
                 xx = inputs.to_dense()[:, i, :].to(device_1)
