@@ -171,18 +171,21 @@ def es_geht():
                 xx = inputs.to_dense()[:, i, :].to(device_1)
                 b_spk = model(xx)
                 del xx
-                torch.cuda.empty_cache()
             
             b_spk.to(device_2)
             model_spk.append(b_spk)
+            
             del b_spk
-            with torch.cuda.device(device_1): torch.cuda.empty_cache() 
+            with torch.cuda.device(device_1): torch.cuda.empty_cache()
             progress_bar.update(1)   
         progress_bar.close()
 
         # Calculate and print('Accuracy: ', 1)
         del model_spk
+        with torch.cuda.device(device_0): torch.cuda.empty_cache()
         with torch.cuda.device(device_1): torch.cuda.empty_cache()
+        with torch.cuda.device(device_2): torch.cuda.empty_cache()
+        
         print('Available CUDA memory: ', torch.cuda.mem_get_info()[0] / (1024 * 1024))
 
     for j in range(20):
