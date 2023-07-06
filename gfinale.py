@@ -160,23 +160,23 @@ def es_geht():
     for _ in range(1, epochs+1):
         progress_bar = tqdm(total = len(shd_train), desc = 'Epoch {}'.format(_))
         model_spk = []
-        
+        model_spk.to(device_2)
         for batch in shd_train:
             inputs, labels = batch
             b_size, seq_num, i_size = inputs.shape
-            b_spk = 1
+            b_spk = torch.zeros(b_size, 20).to(device_2) 
+            
             for i in range(seq_num):
                 xx = inputs.to_dense()[:, i, :]
-                b_spk = model(xx) 
-                print(type(b_spk))
+                b_spk = model(xx)
                 del xx
-                
+
+            b_spk.to(device_2)
             model_spk.append(b_spk)      
             progress_bar.update(1)   
         progress_bar.close()
         
         # Calculate and print('Accuracy: ', 1)
-        model_spk = []
         
         torch.cuda.empty_cache()
         print('Available CUDA memory: ', torch.cuda.mem_get_info()[0] / (1024 * 1024))
