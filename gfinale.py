@@ -131,7 +131,7 @@ def LSNN_network(nn.Module):
 
     def forward(self, x_t):
         return self.network(x_t)
-
+    
 def es_geht():
     print('PARSING ARGUMENTS...')
     parser = argparse.ArgumentParser()
