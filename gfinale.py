@@ -169,6 +169,7 @@ def es_geht():
             for i in range(seq_num):
                 xx = inputs.to_dense()[:, i, :]
                 b_spk = model(xx)
+                b_spk = 1
                 del xx
                 
             print(b_spk)
