@@ -179,7 +179,7 @@ def es_geht():
         progress_bar.close()
         print(len(model_spk))
         # Calculate and print('Accuracy: ', 1)
-        
+        del model_spk
         torch.cuda.empty_cache()
         print('Available CUDA memory: ', torch.cuda.mem_get_info()[0] / (1024 * 1024))
 
