@@ -89,31 +89,32 @@ class LSNN_layer(nn.Module):
         nn.init.zeros_(self.T_m.bias)
 
     def forward(self, x_t):
-        """
-        Used to train the layer using Forward Pass Through Time Algorithm and update its parameters
-        INPUT: Input Spikes
-        OUTPUT: Membrane Potential, Spikes and Intermediate State Variable (b_t)
-        """
-        L1 = self.syn(x_t.to(device_1))
-        
-        # T_m = self.act(self.T_m(L1 + self.u_t))
-        # T_adp = self.act(self.T_adp(L1 + self.b_t))
-        
-        alpha = self.act(self.T_m(L1 + self.u_t))
-        rho = self.act(self.T_adp(L1 + self.b_t))
-      
-        self.b_t = (rho * self.b_t) + ((1 - rho) * self.spk)
-        self.thr = self.thr_min + (1.8 * self.b_t)
-
-        # du = (-self.u_t + L1) / alpha
-        self.u_t = self.u_t + ((-self.u_t + L1) / alpha)
-
-        self.spk = self.u_t - self.thr
-        self.spk = self.spk.gt(0).float()
-        self.u_t = self.u_t * (1 - self.spk) + (self.u_r * self.spk)
-        self.spk = self.spk
-
-        return self.spk
+        with torch.no_grad():
+            """
+            Used to train the layer using Forward Pass Through Time Algorithm and update its parameters
+            INPUT: Input Spikes
+            OUTPUT: Membrane Potential, Spikes and Intermediate State Variable (b_t)
+            """
+            L1 = self.syn(x_t.to(device_1))
+            
+            # T_m = self.act(self.T_m(L1 + self.u_t))
+            # T_adp = self.act(self.T_adp(L1 + self.b_t))
+            
+            alpha = self.act(self.T_m(L1 + self.u_t))
+            rho = self.act(self.T_adp(L1 + self.b_t))
+          
+            self.b_t = (rho * self.b_t) + ((1 - rho) * self.spk)
+            self.thr = self.thr_min + (1.8 * self.b_t)
+    
+            # du = (-self.u_t + L1) / alpha
+            self.u_t = self.u_t + ((-self.u_t + L1) / alpha)
+    
+            self.spk = self.u_t - self.thr
+            self.spk = self.spk.gt(0).float()
+            self.u_t = self.u_t * (1 - self.spk) + (self.u_r * self.spk)
+            self.spk = self.spk
+    
+            return self.spk
 
 class LSNN_network(nn.Module):
     def __init__(self, b_size):
@@ -127,7 +128,8 @@ class LSNN_network(nn.Module):
         self.network = nn.Sequential(*layers)
 
     def forward(self, x_t):
-        return self.network(x_t)
+        with torch.no_grad():
+            return self.network(x_t)
     
 def es_geht():
     print('PARSING ARGUMENTS...')
