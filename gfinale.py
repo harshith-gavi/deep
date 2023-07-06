@@ -160,7 +160,7 @@ def es_geht():
     for _ in range(1, epochs+1):
         progress_bar = tqdm(total = len(shd_train), desc = 'Epoch {}'.format(_))
         model_spk = []
-        model_spk.to(device_2)
+
         for batch in shd_train:
             inputs, labels = batch
             b_size, seq_num, i_size = inputs.shape
@@ -172,7 +172,8 @@ def es_geht():
                 del xx
 
             b_spk.to(device_2)
-            model_spk.append(b_spk)      
+            model_spk.append(b_spk)   
+            model_spk.to(device_2)
             progress_bar.update(1)   
         progress_bar.close()
         
