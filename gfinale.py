@@ -115,7 +115,7 @@ class LSNN_layer(nn.Module):
 
         o_spk = self.spk
         
-        del x_t, L1, T_m, T_adp, alpha, rho, du
+        del x_t, L1, alpha, rho, du #T_m, T_adp,
         return o_spk
 
 class LSNN_network(nn.Module):
