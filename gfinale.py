@@ -118,7 +118,7 @@ class LSNN_layer(nn.Module):
         del x_t, L1, T_m, T_adp, alpha, rho, du
         return o_spk
 
-def LSNN_network(nn.Module):
+class LSNN_network(nn.Module):
     def __init__(self):
         super(LSNN_network, self).__init__()
 
