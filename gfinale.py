@@ -94,7 +94,6 @@ class LSNN_layer(nn.Module):
         INPUT: Input Spikes
         OUTPUT: Membrane Potential, Spikes and Intermediate State Variable (b_t)
         """
-        # x_t = x_t.to(device_1)
         L1 = self.syn(x_t)
         
         # T_m = self.act(self.T_m(L1 + self.u_t))
