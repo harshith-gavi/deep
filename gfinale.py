@@ -170,12 +170,13 @@ def es_geht():
                 xx = inputs.to_dense()[:, i, :]
                 b_spk = model(xx)
                 del xx
-
+                
+            print(b_spk)
             b_spk.to(device_2)
             model_spk.append(b_spk)
             progress_bar.update(1)   
         progress_bar.close()
-        
+        print(len(model_spk))
         # Calculate and print('Accuracy: ', 1)
         
         torch.cuda.empty_cache()
