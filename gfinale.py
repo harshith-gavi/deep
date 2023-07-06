@@ -151,7 +151,6 @@ def es_geht():
     print('Available CUDA memory: ', torch.cuda.mem_get_info()[0] / (1024 * 1024))
     print('CREATING A MODEL...')    
     model = LSNN_network(b_size)
-    # model.to(device_2)
 
     print('Available CUDA memory: ', torch.cuda.mem_get_info()[0] / (1024 * 1024))
     print('TRAINING THE MODEL...')
@@ -169,7 +168,7 @@ def es_geht():
                 xx = inputs.to_dense()[:, i, :]
                 b_spk = model(xx)
             
-            b_spk.to(device_2)
+            b_spk = b_spk.to(device_2)
             model_spk.append(b_spk)
             
             progress_bar.update(1)   
