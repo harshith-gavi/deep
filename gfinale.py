@@ -119,13 +119,12 @@ class LSNN_layer(nn.Module):
         return o_spk
 
 class LSNN_network(nn.Module):
-    def __init__(self):
+    def __init__(self, b_size):
         super(LSNN_network, self).__init__()
 
         i_size = 700
         h_size = [128, 64]
         o_size = 20
-        b_size = args.batch_size
 
         layers = [LSNN_layer(i_size, h_size[0], b_size), LSNN_layer(h_size[0], h_size[1], b_size), LSNN_layer(h_size[1], o_size, b_size)]
         self.network = nn.Sequential(*layers)
@@ -153,7 +152,7 @@ def es_geht():
     
     print('Available CUDA memory: ', torch.cuda.mem_get_info()[0] / (1024 * 1024))
     print('CREATING A MODEL...')    
-    model = LSNN_network()
+    model = LSNN_network(b_size)
 
     print('Available CUDA memory: ', torch.cuda.mem_get_info()[0] / (1024 * 1024))
     print('TRAINING THE MODEL...')
