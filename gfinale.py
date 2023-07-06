@@ -147,6 +147,7 @@ def es_geht():
     shd_test = data_mod(shd_test['spikes'], shd_test['labels'], batch_size = 1, step_size = 100, input_size = tonic.datasets.SHD.sensor_size[0], max_time = 1.4)
 
     shd_train = shd_train[:int(0.8 * len(shd_train))]
+    shd_val = shd_train[int(0.8 * len(shd_train)):]
     
     print('Available CUDA memory: ', torch.cuda.mem_get_info()[0] / (1024 * 1024))
     print('CREATING A MODEL...')    
