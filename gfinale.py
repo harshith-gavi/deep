@@ -68,7 +68,7 @@ class LSNN_layer(nn.Module):
     def __init__(self, i_size, o_size, b_size):
         super(LSNN_layer, self).__init__()
 
-        self.u_r = 0                                                        # Resting Potential
+        self.u_r = 0.01                                                     # Resting Potential
         self.thr = 0.5                                                      # Threshold
         self.thr_min = 0.01                                                 # Threshold Baseline
         self.u_t = torch.zeros(b_size, o_size).to(device_1)                 # Membrane Potential
@@ -95,8 +95,8 @@ class LSNN_layer(nn.Module):
         INPUT: Input Spikes
         OUTPUT: Membrane Potential, Spikes and Intermediate State Variable (b_t)
         """
-        x_t = x_t.to(device_1)
         L1 = self.syn(x_t)
+        
         # T_m = self.act(self.T_m(L1 + self.u_t))
         # T_adp = self.act(self.T_adp(L1 + self.b_t))
         
@@ -167,7 +167,7 @@ def es_geht():
             b_spk = 0
             
             for i in range(seq_num):
-                xx = inputs.to_dense()[:, i, :]
+                xx = inputs.to_dense()[:, i, :].to(device_1)
                 b_spk = model(xx)
                 del xx
                 
