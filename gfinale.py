@@ -170,12 +170,12 @@ def es_geht():
             for i in range(seq_num):
                 xx = inputs.to_dense()[:, i, :]
                 b_spk = model(xx)
-            
+                print(b_spk.mean(0))
             model_spk.append(b_spk.to(device_2))
             
             progress_bar.update(1)   
         progress_bar.close()
-        print(model_spk.mean(0))
+        
         # Calculate and print('Accuracy: ', 1)
 
 es_geht()
