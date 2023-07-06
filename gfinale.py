@@ -115,7 +115,7 @@ class LSNN_layer(nn.Module):
         self.spk = self.spk
 
         del x_t, L1, alpha, rho, du
-        torch.cuda.empty_cache()
+        with torch.cuda.device(device_1): torch.cuda.empty_cache() 
 
         return self.spk
 
