@@ -114,9 +114,6 @@ class LSNN_layer(nn.Module):
         self.u_t = self.u_t * (1 - self.spk) + (self.u_r * self.spk)
         self.spk = self.spk
 
-        del x_t, L1, alpha, rho, du
-        with torch.cuda.device(device_1): torch.cuda.empty_cache() 
-
         return self.spk
 
 class LSNN_network(nn.Module):
@@ -170,20 +167,14 @@ def es_geht():
             for i in range(seq_num):
                 xx = inputs.to_dense()[:, i, :].to(device_1)
                 b_spk = model(xx)
-                del xx
             
             b_spk.to(device_2)
             model_spk.append(b_spk)
             
-            del b_spk
-            with torch.cuda.device(device_1): torch.cuda.empty_cache()
             progress_bar.update(1)   
         progress_bar.close()
 
         # Calculate and print('Accuracy: ', 1)
-        del model_spk
-        with torch.cuda.device(device_1): torch.cuda.empty_cache()
-        with torch.cuda.device(device_2): torch.cuda.empty_cache()
         
         print('Available CUDA memory: ', torch.cuda.mem_get_info()[0] / (1024 * 1024))
 
