@@ -15,15 +15,14 @@ device_0 = torch.device('cpu')
 device_1 = torch.device('cuda:0')  # First CUDA device
 device_2 = torch.device('cuda:1')  # Second CUDA device
 
-def data_mod(X, y, batch_size, step_size, input_size, max_time, shuffle=True):
+def data_mod(X, y, batch_size, step_size, input_size, max_time, shuffle=False):
     '''
-    This function modifies SHD dataset into batches of data
+    This function generates batches of sparse data from the SHD dataset
     '''
     labels = np.array(y, int)
     nb_batches = len(labels)//batch_size
     sample_index = np.arange(len(labels))
 
-    # compute discrete firing times
     firing_times = X['times']
     units_fired = X['units']
 
@@ -48,7 +47,7 @@ def data_mod(X, y, batch_size, step_size, input_size, max_time, shuffle=True):
             coo[1].extend(times)
             coo[2].extend(units)
 
-        i = torch.LongTensor(coo).to(device_0)
+        i = torch.IntTensor(coo).to(device_0)
         v = torch.FloatTensor(np.ones(len(coo[0]))).to(device_0)
 
         X_batch = torch.sparse.FloatTensor(i, v, torch.Size([batch_size,step_size,input_size])).to(device_0)
@@ -177,9 +176,9 @@ def es_geht():
             model_spk.append(b_spk)
             progress_bar.update(1)   
         progress_bar.close()
-        print(len(model_spk))
+
         # Calculate and print('Accuracy: ', 1)
-        del model_spk
+
         torch.cuda.empty_cache()
         print('Available CUDA memory: ', torch.cuda.mem_get_info()[0] / (1024 * 1024))
 
