@@ -168,9 +168,9 @@ def es_geht():
             
             for i in range(seq_num):
                 xx = inputs.to_dense()[:, i, :]
-                b_spk.extend(model(xx))
+                b_spk.append(model(xx))
                
-                del xx, o_spk
+                del xx
                 
             model_spk.append(b_spk)      
             progress_bar.update(1)   
