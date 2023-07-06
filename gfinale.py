@@ -120,7 +120,7 @@ class LSNN_layer(nn.Module):
 
 def LSNN_network(nn.Module):
     def __init__(self):
-        super(LSNN_model, self).__init__()
+        super(LSNN_network, self).__init__()
 
         i_size = 700
         h_size = [128, 64]
