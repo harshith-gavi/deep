@@ -94,7 +94,7 @@ class LSNN_layer(nn.Module):
         INPUT: Input Spikes
         OUTPUT: Membrane Potential, Spikes and Intermediate State Variable (b_t)
         """
-        L1 = self.syn(x_t)
+        L1 = self.syn(x_t.to(device_1))
         
         # T_m = self.act(self.T_m(L1 + self.u_t))
         # T_adp = self.act(self.T_adp(L1 + self.b_t))
@@ -166,7 +166,7 @@ def es_geht():
             b_spk = None
             
             for i in range(seq_num):
-                xx = inputs.to_dense()[:, i, :].to(device_1)
+                xx = inputs.to_dense()[:, i, :]
                 b_spk = model(xx)
             
             b_spk.to(device_2)
