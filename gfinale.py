@@ -175,10 +175,7 @@ def es_geht():
             
             progress_bar.update(1)   
         progress_bar.close()
-
+        print(model_spk.mean(0))
         # Calculate and print('Accuracy: ', 1)
-
-    for j in range(20):
-        print(model_spk[0][j])
 
 es_geht()
