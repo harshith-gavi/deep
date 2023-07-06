@@ -89,12 +89,13 @@ class LSNN_layer(nn.Module):
         nn.init.zeros_(self.T_m.bias)
 
     def forward(self, x_t):
-        with torch.no_grad():
-            """
+        """
             Used to train the layer using Forward Pass Through Time Algorithm and update its parameters
             INPUT: Input Spikes
             OUTPUT: Membrane Potential, Spikes and Intermediate State Variable (b_t)
-            """
+        """
+        with torch.no_grad():
+            
             L1 = self.syn(x_t.to(device_1))
             
             # T_m = self.act(self.T_m(L1 + self.u_t))
@@ -121,7 +122,7 @@ class LSNN_network(nn.Module):
         super(LSNN_network, self).__init__()
 
         i_size = 700
-        h_size = [128, 64]
+        h_size = [256, 64]
         o_size = 20
 
         layers = [LSNN_layer(i_size, h_size[0], b_size), LSNN_layer(h_size[0], h_size[1], b_size), LSNN_layer(h_size[1], o_size, b_size)]
@@ -135,7 +136,7 @@ def es_geht():
     print('PARSING ARGUMENTS...')
     parser = argparse.ArgumentParser()
     parser.add_argument('--batch_size', type = int, default = 128)
-    parser.add_argument('--epochs', type = int, default = 10)
+    parser.add_argument('--epochs', type = int, default = 100)
     args = parser.parse_args()
     b_size = args.batch_size
     epochs = args.epochs
