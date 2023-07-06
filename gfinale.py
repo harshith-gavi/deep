@@ -172,8 +172,7 @@ def es_geht():
                 del xx
 
             b_spk.to(device_2)
-            model_spk.append(b_spk)   
-            model_spk.to(device_2)
+            model_spk.append(b_spk)
             progress_bar.update(1)   
         progress_bar.close()
         
