@@ -113,7 +113,7 @@ class LSNN_layer(nn.Module):
         self.spk = self.spk.gt(0).float()
         self.u_t = self.u_t * (1 - self.spk) + (self.u_r * self.spk)
 
-        o_spk = self.spk_t
+        o_spk = self.spk
         
         del x_t, L1, T_m, T_adp, alpha, rho, du
         return o_spk
