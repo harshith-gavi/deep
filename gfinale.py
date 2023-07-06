@@ -165,12 +165,14 @@ def es_geht():
             inputs, labels = batch
             b_size, seq_num, i_size = inputs.shape
             b_spk = []
+            
             for i in range(seq_num):
                 xx = inputs.to_dense()[:, i, :]
                 b_spk.extend(model(xx))
                
                 del xx, o_spk
-             model_spk.append(b_spk)      
+                
+            model_spk.append(b_spk)      
             progress_bar.update(1)   
         progress_bar.close()
         
