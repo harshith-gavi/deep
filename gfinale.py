@@ -171,8 +171,7 @@ def es_geht():
                 xx = inputs.to_dense()[:, i, :]
                 b_spk = model(xx)
                 
-            print(b_spk)
-            print(b_spk.mean(0))
+            print(b_spk.mean(0).shape)
             model_spk.append(b_spk.to(device_2))
             
             progress_bar.update(1)   
