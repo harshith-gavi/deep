@@ -164,15 +164,13 @@ def es_geht():
         for batch in shd_train:
             inputs, labels = batch
             b_size, seq_num, i_size = inputs.shape
-            b_spk = torch.zeros(b_size, 20).to(device_2) 
+            b_spk = 0
             
             for i in range(seq_num):
                 xx = inputs.to_dense()[:, i, :]
                 b_spk = model(xx)
-                b_spk = 1
                 del xx
                 
-            print(b_spk)
             b_spk.to(device_2)
             model_spk.append(b_spk)
             progress_bar.update(1)   
