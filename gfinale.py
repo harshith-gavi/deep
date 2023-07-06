@@ -115,7 +115,8 @@ class LSNN_layer(nn.Module):
 
         o_spk = self.spk
         
-        del x_t, L1, alpha, rho, du #T_m, T_adp,
+        del x_t, L1, alpha, rho, du
+        torch.cuda.empty_cache()
         return o_spk
 
 class LSNN_network(nn.Module):
@@ -145,8 +146,8 @@ def es_geht():
     shd_train = h5py.File(datapath + 'train_data/SHD/shd_train.h5', 'r')
     shd_test = h5py.File(datapath + 'test_data/SHD/shd_test.h5', 'r')
     
-    shd_train = data_mod(shd_train['spikes'], shd_train['labels'], batch_size = b_size, step_size = 10, input_size = tonic.datasets.SHD.sensor_size[0], max_time = 1.4)
-    shd_test = data_mod(shd_test['spikes'], shd_test['labels'], batch_size = 1, step_size = 10, input_size = tonic.datasets.SHD.sensor_size[0], max_time = 1.4)
+    shd_train = data_mod(shd_train['spikes'], shd_train['labels'], batch_size = b_size, step_size = 100, input_size = tonic.datasets.SHD.sensor_size[0], max_time = 1.4)
+    shd_test = data_mod(shd_test['spikes'], shd_test['labels'], batch_size = 1, step_size = 100, input_size = tonic.datasets.SHD.sensor_size[0], max_time = 1.4)
 
     shd_train = shd_train[:int(0.8 * len(shd_train))]
     
@@ -170,7 +171,8 @@ def es_geht():
                 xx = inputs.to_dense()[:, i, :].to(device_1)
                 b_spk = model(xx)
                 del xx
-                
+                torch.cuda.empty_cache()
+            
             b_spk.to(device_2)
             model_spk.append(b_spk)
             progress_bar.update(1)   
