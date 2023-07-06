@@ -82,12 +82,12 @@ class LSNN_layer(nn.Module):
         self.act = nn.Sigmoid()
 
         # Parameter Initialisation
-        nn.init.ones_(self.syn1.weight)                                     
-        nn.init.zeros_(self.syn1.bias)
-        nn.init.ones_(self.l1_T_adp.weight)
-        nn.init.ones_(self.l1_T_m.weight)
-        nn.init.zeros_(self.l1_T_adp.bias)
-        nn.init.zeros_(self.l1_T_m.bias)
+        nn.init.ones_(self.syn.weight)                                     
+        nn.init.zeros_(self.syn.bias)
+        nn.init.ones_(self.T_adp.weight)
+        nn.init.ones_(self.T_m.weight)
+        nn.init.zeros_(self.T_adp.bias)
+        nn.init.zeros_(self.T_m.bias)
 
     def forward(self, x_t):
         """
