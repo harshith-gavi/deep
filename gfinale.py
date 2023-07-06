@@ -94,6 +94,7 @@ class LSNN_layer(nn.Module):
         INPUT: Input Spikes
         OUTPUT: Membrane Potential, Spikes and Intermediate State Variable (b_t)
         """
+        x_t = x_t.to(device_1)
         L1 = self.syn(x_t)
         
         # T_m = self.act(self.T_m(L1 + self.u_t))
@@ -111,12 +112,11 @@ class LSNN_layer(nn.Module):
         self.spk = self.u_t - self.thr
         self.spk = self.spk.gt(0).float()
         self.u_t = self.u_t * (1 - self.spk) + (self.u_r * self.spk)
-
-        o_spk = self.spk
+        self.spk = self.spk.to(device_2)
         
         del x_t, L1, alpha, rho, du
         torch.cuda.empty_cache()
-        return o_spk
+        return self.spk
 
 class LSNN_network(nn.Module):
     def __init__(self, b_size):
@@ -148,7 +148,7 @@ def es_geht():
     shd_train = data_mod(shd_train['spikes'], shd_train['labels'], batch_size = b_size, step_size = 100, input_size = tonic.datasets.SHD.sensor_size[0], max_time = 1.4)
     shd_test = data_mod(shd_test['spikes'], shd_test['labels'], batch_size = 1, step_size = 100, input_size = tonic.datasets.SHD.sensor_size[0], max_time = 1.4)
 
-    shd_train = shd_train[:int(0.8 * len(shd_train))].to(device_2)
+    shd_train = shd_train[:int(0.8 * len(shd_train))]
     
     print('Available CUDA memory: ', torch.cuda.mem_get_info()[0] / (1024 * 1024))
     print('CREATING A MODEL...')    
