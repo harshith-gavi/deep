@@ -97,12 +97,12 @@ class LSNN_layer(nn.Module):
         """
         x_t = x_t.to(device_1)
         L1 = self.syn(x_t)
-        T_m = self.act(self.T_m(L1 + self.u_t))
-        T_adp = self.act(self.T_adp(L1 + self.b_t))
+        # T_m = self.act(self.T_m(L1 + self.u_t))
+        # T_adp = self.act(self.T_adp(L1 + self.b_t))
+        
+        alpha = self.act(self.T_m(L1 + self.u_t))
+        rho = self.act(self.T_adp(L1 + self.b_t))
       
-        alpha = T_m
-        rho = T_adp
-
         self.b_t = (rho * self.b_t) + ((1 - rho) * self.spk)
         self.thr = self.thr_min + (1.8 * self.b_t)
 
