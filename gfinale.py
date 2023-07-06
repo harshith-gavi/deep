@@ -176,7 +176,7 @@ def es_geht():
             b_spk.to(device_2)
             model_spk.append(b_spk)
             del b_spk
-            torch.cuda.empty_cache()
+            with torch.cuda.device(device_1): torch.cuda.empty_cache() 
             progress_bar.update(1)   
         progress_bar.close()
 
