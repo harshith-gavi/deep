@@ -113,10 +113,11 @@ class LSNN_layer(nn.Module):
         self.spk = self.spk.gt(0).float()
         self.u_t = self.u_t * (1 - self.spk) + (self.u_r * self.spk)
         self.spk = self.spk
-        print('Available CUDA memory: ', torch.cuda.mem_get_info()[0] / (1024 * 1024))
+
+        x_t, L1, alpha, rho, du = None, None, None, None, None
         del x_t, L1, alpha, rho, du
         torch.cuda.empty_cache()
-        print('Available CUDA memory: ', torch.cuda.mem_get_info()[0] / (1024 * 1024))
+
         return self.spk
 
 class LSNN_network(nn.Module):
