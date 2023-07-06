@@ -112,7 +112,7 @@ class LSNN_layer(nn.Module):
         self.spk = self.u_t - self.thr
         self.spk = self.spk.gt(0).float()
         self.u_t = self.u_t * (1 - self.spk) + (self.u_r * self.spk)
-        self.spk = self.spk.to(device_2)
+        self.spk = self.spk
         
         del x_t, L1, alpha, rho, du
         torch.cuda.empty_cache()
