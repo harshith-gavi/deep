@@ -123,7 +123,7 @@ class LSNN_network(nn.Module):
         super(LSNN_network, self).__init__()
 
         i_size = 700
-        h_size = [256, 64]
+        h_size = [128, 64]
         o_size = 20
 
         layers = [LSNN_layer(i_size, h_size[0], b_size), LSNN_layer(h_size[0], h_size[1], b_size), LSNN_layer(h_size[1], o_size, b_size)]
@@ -164,13 +164,13 @@ def es_geht():
         for batch in shd_train:
             inputs, labels = batch
             b_size, seq_num, i_size = inputs.shape
-    
+            b_spk = []
             for i in range(seq_num):
                 xx = inputs.to_dense()[:, i, :]
-                o_spk = model(xx)
-                model_spk.append(o_spk)
+                b_spk.extend(model(xx))
+               
                 del xx, o_spk
-                       
+             model_spk.append(b_spk)      
             progress_bar.update(1)   
         progress_bar.close()
         
