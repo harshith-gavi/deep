@@ -65,7 +65,7 @@ class LSNN_layer(nn.Module):
     LSNN layer module
     INPUT: Input Size, Output Size
     """
-    def __init__(self, i_size, o_size):
+    def __init__(self, i_size, o_size, b_size):
         super(LSNN_layer, self).__init__()
 
         self.u_r = 0                                                        # Resting Potential
@@ -125,8 +125,9 @@ class LSNN_network(nn.Module):
         i_size = 700
         h_size = [128, 64]
         o_size = 20
+        b_size = args.batch_size
 
-        layers = [LSNN_layer(i_size, h_size[0]), LSNN_layer(h_size[0], h_size[1]), LSNN_layer(h_size[1], o_size)]
+        layers = [LSNN_layer(i_size, h_size[0], b_size), LSNN_layer(h_size[0], h_size[1], b_size), LSNN_layer(h_size[1], o_size, b_size)]
         self.network = nn.Sequential(*layers)
 
     def forward(self, x_t):
