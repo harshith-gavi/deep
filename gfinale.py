@@ -145,8 +145,8 @@ def es_geht():
     shd_train = h5py.File(datapath + 'train_data/SHD/shd_train.h5', 'r')
     shd_test = h5py.File(datapath + 'test_data/SHD/shd_test.h5', 'r')
     
-    shd_train = data_mod(shd_train['spikes'], shd_train['labels'], batch_size = b_size, step_size = 100, input_size = tonic.datasets.SHD.sensor_size[0], max_time = 1.2)
-    shd_test = data_mod(shd_test['spikes'], shd_test['labels'], batch_size = 1, step_size = 100, input_size = tonic.datasets.SHD.sensor_size[0], max_time = 1.2)
+    shd_train = data_mod(shd_train['spikes'], shd_train['labels'], batch_size = b_size, step_size = 100, input_size = tonic.datasets.SHD.sensor_size[0], max_time = 1)
+    shd_test = data_mod(shd_test['spikes'], shd_test['labels'], batch_size = 1, step_size = 100, input_size = tonic.datasets.SHD.sensor_size[0], max_time = 1)
 
     shd_train = shd_train[:int(0.8 * len(shd_train))]
     
