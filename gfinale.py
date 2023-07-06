@@ -182,7 +182,6 @@ def es_geht():
 
         # Calculate and print('Accuracy: ', 1)
         del model_spk
-        with torch.cuda.device(device_0): torch.cuda.empty_cache()
         with torch.cuda.device(device_1): torch.cuda.empty_cache()
         with torch.cuda.device(device_2): torch.cuda.empty_cache()
         
