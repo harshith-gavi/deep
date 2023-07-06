@@ -168,8 +168,9 @@ def es_geht():
             
             for i in range(seq_num):
                 xx = inputs.to_dense()[:, i, :]
-                b_spk.append(model(xx))
-               
+                cucoo = model(xx)
+                # b_spk.append(model(xx))
+                print(cucoo.shape)               
                 del xx
                 
             model_spk.append(b_spk)      
