@@ -65,7 +65,7 @@ class Processing_layer(nn.Module):
     INPUT: Input Size, Output Size
     """
     def __init__(self, i_size, o_size, b_size):
-        super(LSNN_layer, self).__init__()
+        super(Processing_layer, self).__init__()
 
         self.u_r = 0.01                                                     # Resting Potential
         self.thr = 0.5                                                      # Threshold
@@ -123,7 +123,7 @@ class Output_layer(nn.Module):
     INPUT: Input Size, Output Size
     """
     def __init__(self, i_size, o_size, b_size):
-        super(LSNN_layer, self).__init__()
+        super(Output_layer, self).__init__()
 
         self.u_r = 0.01                                                     # Resting Potential
         self.thr = 0.5                                                      # Threshold
