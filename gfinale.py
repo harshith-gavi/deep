@@ -177,7 +177,7 @@ class Output_layer(nn.Module):
 
 class LSNN(nn.Module):
     def __init__(self, b_size):
-        super(LSNN_network, self).__init__()
+        super(LSNN, self).__init__()
 
         i_size = 700
         h_size = [256, 64]
