@@ -237,10 +237,10 @@ def es_geht():
             b_spk = torch.sum(torch.stack(b_spk), dim=0)
             val, idx = torch.max(b_spk, dim=1)
             preds.append(idx)
-            
-            progress_bar.update(1)   
+            progress_bar.update(1)
+
         progress_bar.close()
-        
+        print(preds)
         # Calculate and print('Accuracy: ', 1)
 
 es_geht()
