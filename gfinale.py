@@ -236,6 +236,7 @@ def es_geht():
 
             b_spk = torch.sum(torch.stack(b_spk), dim=0)
             val, idx = torch.max(b_spk, dim=1)
+            print(idx.shape)
             preds.append(idx)
             progress_bar.update(1)
 
